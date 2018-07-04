@@ -9,6 +9,11 @@ body {
   font-size: 14px;
   background-color: #f3f5f7;
 }
+body aside {
+  height: 100%;
+  position: fixed;
+  left: 0;
+}
 body .sign-in {
   text-align: center;
   align-content: center;
@@ -24,6 +29,7 @@ body .mainHeading {
 }
 body .name {
   color: darkgray;
+  font-size: 1.2rem;
 }
 body h1 {
   font-weight: 100;
@@ -39,33 +45,6 @@ body div.areaInfo {
 }
 body div.areaInfo p.region {
   font-weight: bold;
-}
-body p.status {
-  position: relative;
-  z-index: 2;
-  top: 50px;
-  right: 30px;
-  padding: 5px;
-  width: 70px;
-  border-radius: 20px;
-  text-align: center;
-  text-transform: uppercase;
-}
-body p.status.draft {
-  background-color: #91a5af;
-}
-body p.status.listed {
-  background-color: #68bc69;
-}
-body p.status.rented {
-  background-color: #bcc8cf;
-}
-body main {
-  margin-left: 40px;
-  font-family: "Open Sans", Arial, sans-serif;
-  float: left;
-  text-align: left;
-  width: 700px;
 }
 body aside {
   background-color: white;
@@ -100,40 +79,12 @@ body h1 em {
   color: gray;
   font-style: normal;
 }
-body article {
-  display: inline-block;
-  margin: 10px;
-  box-shadow: 8px 6px 17px -1px rgba(0, 0, 0, 0.26);
-}
-body img.apartment {
-  width: 200px;
-}
-body .appInfo, body .unit {
-  margin-left: 10px;
-  text-transform: capitalize;
-}
-body article {
-  z-index: 1;
-  background-color: white;
-}
-body img.apartment {
-  width: 210px;
-}
-body .btnAdd {
-  float: left;
-  margin-top: 25px;
-  padding: 5px 15px;
-  background-color: #ff7739;
-  border-radius: 15px;
-  text-transform: uppercase;
-  font-family: Comfortaa, sans-serif;
-  font-size: 14px;
-  border: 2px solid #ff7739;
-}
-body .btnAdd:hover {
-  cursor: pointer;
-  background: none;
-  border: 2px solid #ff7739;
+body .editor {
+  margin-left: 270px;
+  border: 1px solid #ccc;
+  cursor: text;
+  min-height: 80px;
+  padding: 10px;
 }
 
 /*# sourceMappingURL=styles.css.map */

@@ -3,6 +3,7 @@ import "./App.css";
 import firebase, { auth, provider } from "./firebase";
 import SignInForm from "./components/SignInForm";
 import Sidebar from "./components/Sidebar";
+import MyEditor from "./components/Editor";
 
 class App extends Component {
   constructor(props) {
@@ -37,12 +38,12 @@ class App extends Component {
       <SignInForm parentState={this} login={this.login} />
     ) : (
       <div className='container'>
-       <Sidebar displayName={this.state.user.displayName} img={this.state.user.photoURL}/>
+       <Sidebar displayName={this.state.user.displayName} img={this.state.user.photoURL} logout={this.logout}/>
         <main>
           <header>
-            //Editor
-          </header>
           
+          </header>
+          <MyEditor/>
         </main>
         <div>
           //buttons

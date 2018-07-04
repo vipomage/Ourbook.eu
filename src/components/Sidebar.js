@@ -15,6 +15,7 @@ export default class Sidebar extends Component {
           alt="profile-picture"
         />
         <p className="name">{this.props.displayName}</p>
+        <button className='btn btn-warning' onClick={this.props.logout}>Log out</button>
         <nav>
           <ul>
             <li>

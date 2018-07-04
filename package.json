@@ -3,6 +3,8 @@
   "version": "0.1.0",
   "private": true,
   "dependencies": {
+    "@types/draft-js": "^0.10.23",
+    "draft-js": "^0.10.5",
     "firebase": "^5.2.0",
     "react": "^16.4.1",
     "react-dom": "^16.4.1",

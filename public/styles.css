@@ -1,16 +1,139 @@
 @import "reset.css";
 body {
-  background: #f4f4f4;
-}
-body .form {
+  text-align: center;
+  margin: 0;
+  padding: 0;
   width: 100%;
-  max-width: 420px;
-  padding: 15px;
-  margin: 20% auto;
-  outline: 3px solid gray;
+  height: 810px;
+  font-family: "Comfortaa", sans-serif;
+  font-size: 14px;
+  background-color: #f3f5f7;
 }
-body .form input, body .form .btn {
+body .sign-in {
+  text-align: center;
+  align-content: center;
+}
+body img {
+  background: white;
+  width: 100px;
+  padding: 15px 30px;
+}
+body .mainHeading {
+  text-transform: lowercase;
+  font-size: 30px;
+}
+body .name {
+  color: darkgray;
+}
+body h1 {
+  font-weight: 100;
+}
+body header {
+  height: 60px;
+  text-transform: capitalize;
+  font-weight: 100;
+}
+body div.areaInfo {
+  margin-left: 10px;
+  text-transform: capitalize;
+}
+body div.areaInfo p.region {
+  font-weight: bold;
+}
+body p.status {
+  position: relative;
+  z-index: 2;
+  top: 50px;
+  right: 30px;
+  padding: 5px;
+  width: 70px;
+  border-radius: 20px;
+  text-align: center;
+  text-transform: uppercase;
+}
+body p.status.draft {
+  background-color: #91a5af;
+}
+body p.status.listed {
+  background-color: #68bc69;
+}
+body p.status.rented {
+  background-color: #bcc8cf;
+}
+body main {
+  margin-left: 40px;
+  font-family: "Open Sans", Arial, sans-serif;
+  float: left;
+  text-align: left;
+  width: 700px;
+}
+body aside {
+  background-color: white;
+  float: left;
+  width: 250px;
+  height: 100%;
+  text-align: center;
+  text-transform: uppercase;
+}
+body aside ul {
+  color: darkgray;
+  text-align: left;
+  margin: 0;
+  padding: 10px;
+  line-height: 40px;
+  font-size: 14px;
+}
+body aside li:hover {
+  color: black;
+  cursor: pointer;
+}
+body img.profilePicture {
+  width: 150px;
+  border-radius: 50%;
+}
+body ul {
+  letter-spacing: 2px;
+  list-style: none;
+  text-align: left;
+}
+body h1 em {
+  color: gray;
+  font-style: normal;
+}
+body article {
+  display: inline-block;
   margin: 10px;
+  box-shadow: 8px 6px 17px -1px rgba(0, 0, 0, 0.26);
+}
+body img.apartment {
+  width: 200px;
+}
+body .appInfo, body .unit {
+  margin-left: 10px;
+  text-transform: capitalize;
+}
+body article {
+  z-index: 1;
+  background-color: white;
+}
+body img.apartment {
+  width: 210px;
+}
+body .btnAdd {
+  float: left;
+  margin-top: 25px;
+  padding: 5px 15px;
+  background-color: #ff7739;
+  border-radius: 15px;
+  text-transform: uppercase;
+  font-family: Comfortaa, sans-serif;
+  font-size: 14px;
+  border: 2px solid #ff7739;
+}
+body .btnAdd:hover {
+  cursor: pointer;
+  background: none;
+  border: 2px solid #ff7739;
 }
 
 /*# sourceMappingURL=styles.css.map */

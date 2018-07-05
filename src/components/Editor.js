@@ -7,6 +7,7 @@ import {
   convertFromRaw
 } from "draft-js";
 
+
 export default class MyEditor extends Component {
   constructor(props) {
     super(props);
@@ -26,14 +27,20 @@ export default class MyEditor extends Component {
     this.fontSize = () => {
       this.onChange(RichUtils.tryToRemoveBlockStyle(this.state.editorState));
     };
-    
   }
-
   saveDoc = data => {
     const rawData = convertToRaw(this.state.editorState.getCurrentContent());
-    
-    fetch('')
-    
+    this.props.db.collection('users').add({
+      first:'Ada',
+      last:'Lovelace',
+      born:1815
+    }).then(docRef=>{
+      console.log('Document written with ID ',docRef);
+    }).catch(e=>{
+      console.log('Error adding document: ',e)
+    })
+
+    fetch("");
   };
   render() {
     const raw = convertToRaw(this.state.editorState.getCurrentContent());

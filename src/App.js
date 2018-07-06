@@ -39,9 +39,9 @@ class App extends Component {
           props: {
             displayName: user.displayName,
             email: user.email,
-            shares: "[]",
-            collections: "[]",
-            files: "[]"
+            shares: "{}",
+            collections: "{}",
+            files: "{}"
           }
         };
         firebase
@@ -56,6 +56,10 @@ class App extends Component {
           .catch(e =>
             console.log("Error occurred\n" + JSON.stringify(e.message))
           );
+      }else{
+        this.setState({
+          uid: user.uid
+        });
       }
     });
   };
@@ -73,7 +77,9 @@ class App extends Component {
       .signInWithPopup(provider)
       .then(this.authHandler)
       .catch(e => console.log(e));
+    
   };
+  
   logout = () => {
     firebase
       .auth()

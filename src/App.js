@@ -1,10 +1,11 @@
 import React, { Component } from "react";
 import "./App.css";
 import firebase, { provider } from "./firebase";
-
+import "react-quill/dist/quill.snow.css";
 import SignInForm from "./components/SignInForm";
 import Sidebar from "./components/Sidebar";
 import MyEditor from "./components/Editor";
+import QuillEditor from "./components/Editor2";
 
 class App extends Component {
   constructor(props) {
@@ -26,6 +27,7 @@ class App extends Component {
   }
 
   authHandler = authData => {
+    
     let user = authData.user || authData;
     //check if user with UID exist in users db
     const userRef = firebase.database().ref("users/" + this.state.uid);
@@ -56,7 +58,7 @@ class App extends Component {
           .catch(e =>
             console.log("Error occurred\n" + JSON.stringify(e.message))
           );
-      }else{
+      } else {
         this.setState({
           uid: user.uid
         });
@@ -77,7 +79,6 @@ class App extends Component {
       .signInWithPopup(provider)
       .then(this.authHandler)
       .catch(e => console.log(e));
-    
   };
   
   logout = () => {
@@ -109,8 +110,8 @@ class App extends Component {
               logout={this.logout}
             />
             <main>
-              <header />
-              <MyEditor {...this.state} />
+              {/*<MyEditor {...this.state} />*/}
+              <QuillEditor {...this.state} updateTimer={this.updateTimer} />
             </main>
           </div>
         </div>

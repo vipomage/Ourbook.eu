@@ -2,5 +2,8 @@
   margin: 0 auto;
   padding: 0;
 }
+body .quill .ql-container, div.ql-editor.ql-blank {
+  min-height: -webkit-fill-available;
+  }
 
 /*# sourceMappingURL=reset.css.map */

@@ -86,5 +86,9 @@ body .editor {
   min-height: 80px;
   padding: 10px;
 }
+body .quill {
+  min-height: 20px;
+  margin-top: 20px;
+}
 
 /*# sourceMappingURL=styles.css.map */

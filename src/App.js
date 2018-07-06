@@ -1,6 +1,6 @@
 import React, { Component } from "react";
 import "./App.css";
-import firebase, { auth, provider, db } from "./firebase";
+import firebase, { provider } from "./firebase";
 
 import SignInForm from "./components/SignInForm";
 import Sidebar from "./components/Sidebar";
@@ -10,62 +10,106 @@ class App extends Component {
   constructor(props) {
     super(props);
     this.state = {
-      currentItem: "",
-      username: "",
-      items: [],
-      user: localStorage.getItem("user")
-        ? JSON.parse(localStorage.getItem("user"))
-        : null
+      dbLocation: "",
+      uid: "",
+      user: firebase.auth().currentUser
     };
   }
-  login = () => {
-    auth.signInWithPopup(provider).then(result => {
-      const user = result.user;
-      let userObj = {
-        name: user.displayName,
-        uid: user.uid,
-        profilePicture: user.photoURL,
-        email: user.email
-      };
-      //todo prevent adding user to DB if exists in it
-      db.collection("users")
-        .add(userObj)
-        .then(docRef => {
-          user.docRef = docRef;
-          this.setState({ user });
-          localStorage.setItem("user", JSON.stringify(user));
-        })
-        .catch(function(error) {
-          console.error("Error adding document: ", error);
-        });
+
+  componentWillMount() {
+    firebase.auth().onAuthStateChanged(user => {
+      if (user) {
+        this.authHandler(user);
+        this.setState({ user: user });
+      }
     });
-  };
-  logout = () => {
-    auth.signOut().then(() => {
-      this.setState({
-        user: null
-      });
-      localStorage.clear();
+  }
+
+  authHandler = authData => {
+    let user = authData.user || authData;
+    //check if user with UID exist in users db
+    const userRef = firebase.database().ref("users/" + this.state.uid);
+    userRef.once("value").then(data => {
+      let userData = data.val();
+      // if not so create one
+      if (!userData) {
+        let uid = user.uid;
+        let obj = {};
+        obj[uid] = {
+          props: {
+            displayName: user.displayName,
+            email: user.email,
+            shares: "[]",
+            collections: "[]",
+            files: "[]"
+          }
+        };
+        firebase
+          .database()
+          .ref("users")
+          .set(obj)
+          .then(() => {
+            this.setState({
+              uid: user.uid
+            });
+          })
+          .catch(e =>
+            console.log("Error occurred\n" + JSON.stringify(e.message))
+          );
+      }
     });
   };
 
+  authenticate = () => {
+    firebase
+      .auth()
+      .setPersistence(firebase.auth.Auth.Persistence.SESSION)
+      .then(function() {
+        return firebase.auth().signInWithPopup;
+      });
+
+    firebase
+      .auth()
+      .signInWithPopup(provider)
+      .then(this.authHandler)
+      .catch(e => console.log(e));
+  };
+  logout = () => {
+    firebase
+      .auth()
+      .signOut()
+      .then(() => {
+        this.setState({ user: null, uid: "", dbLocation: "" });
+      })
+      .catch
+      //An error occurred
+      ();
+  };
+
   render() {
-    const home = !this.state.user ? (
-      <SignInForm parentState={this} login={this.login} />
-    ) : (
-      <div className="container">
-        <Sidebar
-          displayName={this.state.user.displayName}
-          img={this.state.user.photoURL}
-          logout={this.logout}
-        />
-        <main>
-          <header />
-          <MyEditor db={db} />
-        </main>
-      </div>
-    );
-    return <div className="App">{home}</div>;
+    if (!this.state.user) {
+      return (
+        <div className="App">
+          <SignInForm {...this.state} login={this.authenticate} />
+        </div>
+      );
+    } else {
+      return (
+        <div className="App">
+          <div className="container">
+            <Sidebar
+              displayName={this.state.user.displayName}
+              img={this.state.user.photoURL}
+              logout={this.logout}
+            />
+            <main>
+              <header />
+              <MyEditor {...this.state} />
+            </main>
+          </div>
+        </div>
+      );
+    }
   }
 }
 

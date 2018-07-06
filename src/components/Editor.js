@@ -1,12 +1,7 @@
 import React, { Component } from "react";
-import {
-  Editor,
-  EditorState,
-  RichUtils,
-  convertToRaw,
-  convertFromRaw
-} from "draft-js";
 
+import {db} from "./../firebase";
+import { Editor, EditorState, RichUtils, convertToRaw } from "draft-js";
 
 export default class MyEditor extends Component {
   constructor(props) {
@@ -24,26 +19,16 @@ export default class MyEditor extends Component {
         RichUtils.toggleInlineStyle(this.state.editorState, "ITALIC")
       );
     };
-    this.fontSize = () => {
-      this.onChange(RichUtils.tryToRemoveBlockStyle(this.state.editorState));
-    };
   }
-  saveDoc = data => {
-    const rawData = convertToRaw(this.state.editorState.getCurrentContent());
-    this.props.db.collection('users').add({
-      first:'Ada',
-      last:'Lovelace',
-      born:1815
-    }).then(docRef=>{
-      console.log('Document written with ID ',docRef);
-    }).catch(e=>{
-      console.log('Error adding document: ',e)
-    })
-
-    fetch("");
+  saveDoc = () => {
+    let data = JSON.stringify(
+      convertToRaw(this.state.editorState.getCurrentContent())
+    );
+    db.ref(this.props.uid + "/").set(data);
+    console.log(data + "\nSaved");
   };
+
   render() {
-    const raw = convertToRaw(this.state.editorState.getCurrentContent());
     return (
       <div className="editor border text p-4">
         <div className="actions border mb-3">
@@ -52,9 +37,6 @@ export default class MyEditor extends Component {
           </button>
           <button className="btn m-1" onClick={this.makeItalic}>
             Italic
-          </button>
-          <button className="btn m-1" onClick={this.fontSize}>
-            Clear Style
           </button>
         </div>
         <Editor

@@ -1,10 +1,6 @@
 import React, { Component } from "react";
 
 export default class Sidebar extends Component {
-  constructor(props) {
-    super(props);
-  }
-
   render() {
     return (
       <aside>
@@ -12,7 +8,7 @@ export default class Sidebar extends Component {
         <img
           className="profilePicture"
           src={this.props.img}
-          alt="profile-picture"
+          alt=""
         />
         <p className="name">{this.props.displayName}</p>
         <button className='btn btn-warning' onClick={this.props.logout}>Log out</button>

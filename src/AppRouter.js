@@ -2,6 +2,7 @@ import React, { Component } from "react";
 import { Route, Switch } from "react-router-dom";
 import QuillEditor from "./components/QuillEdit";
 import MyEditor from "./components/DraftEditor";
+import Welcome from "./components/Welcome";
 
 export default class AppRouter extends Component {
  
@@ -15,6 +16,7 @@ export default class AppRouter extends Component {
         <Route path="/editor" render={this.editorWithUser} />
         <Route path="/documents/:id" render={this.editorWithId} />
         <Route path="/draftEditor" render={this.draftEditor} />
+        <Route path='/' component={Welcome}/>
       </Switch>
     );
   }

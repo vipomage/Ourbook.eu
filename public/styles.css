@@ -49,10 +49,13 @@ body div.areaInfo p.region {
 body aside {
   background-color: white;
   float: left;
-  width: 250px;
+  width: 200px;
   height: 100%;
   text-align: center;
   text-transform: uppercase;
+}
+body aside .user-collection-container {
+  border: 1px solid green;
 }
 body aside ul {
   color: darkgray;
@@ -89,6 +92,11 @@ body .editor {
 body .quill {
   min-height: 20px;
   margin-top: 20px;
+}
+body #root > div > aside > nav {
+  margin: 10px 0;
+  display: grid;
+  padding: 3px;
 }
 
 /*# sourceMappingURL=styles.css.map */

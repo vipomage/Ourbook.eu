@@ -1,17 +1,20 @@
 import React, { Component } from "react";
-import { Route, Switch, Redirect } from "react-router-dom";
-import QuillEditor from "./components/Editor2";
-import Welcome from "./components/Welcome";
+import { Route, Switch } from "react-router-dom";
+import QuillEditor from "./components/QuillEdit";
+import MyEditor from "./components/DraftEditor";
 
 export default class AppRouter extends Component {
-  constructor(props){
-    super(props);
-  }
+ 
+  editorWithId = props => <MyEditor {...this.props} id={props.match.params.id} />;
+  editorWithUser = props => <QuillEditor {...this.props} id={''}/>;
+  draftEditor = props => <MyEditor {...this.props}/>;
+
   render() {
     return (
       <Switch>
-        <Route path='/editor' component={QuillEditor}/>
-        <Route path='/' component={Welcome}/>
+        <Route path="/editor" render={this.editorWithUser} />
+        <Route path="/documents/:id" render={this.editorWithId} />
+        <Route path="/draftEditor" render={this.draftEditor} />
       </Switch>
     );
   }

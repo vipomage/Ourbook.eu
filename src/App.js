@@ -1,12 +1,12 @@
 import React, { Component } from "react";
-import { HashRouter, Route, Switch } from "react-router-dom";
 import "./App.css";
-import firebase, { provider } from "./firebase";
+import { provider } from "./firebase";
+import firebase from 'firebase/app'
+import 'firebase/database';
+import 'firebase/auth'
 import "react-quill/dist/quill.snow.css";
 import SignInForm from "./components/SignInForm";
 import Sidebar from "./components/Sidebar";
-import QuillEditor from "./components/Editor2";
-import Welcome from "./components/Welcome";
 import AppRouter from "./AppRouter";
 
 class App extends Component {
@@ -110,37 +110,14 @@ class App extends Component {
             displayName={this.state.user.displayName}
             img={this.state.user.photoURL}
             logout={this.logout}
+            userCollection={this.state.userCollection}
           />
           <main>
-            <AppRouter/>
+            <AppRouter {...this.state} />
           </main>
         </div>
       );
     }
-
-    // if (!this.state.user) {
-    //   return (
-    //     <div className="App">
-    //       <SignInForm {...this.state} login={this.authenticate} />
-    //     </div>
-    //   );
-    // } else {
-    //   return (
-    //     <div className="App">
-    //       <div className="container">
-    //         <Sidebar
-    //           displayName={this.state.user.displayName}
-    //           img={this.state.user.photoURL}
-    //           logout={this.logout}
-    //         />
-    //         <main>
-    //           {/*<MyEditor {...this.state} />*/}
-    //           <QuillEditor {...this.state} updateTimer={this.updateTimer} />
-    //         </main>
-    //       </div>
-    //     </div>
-    //   );
-    // }
   }
 }
 

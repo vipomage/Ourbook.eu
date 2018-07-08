@@ -2,7 +2,7 @@ import React, { Component } from "react";
 import ReactQuill from "react-quill";
 import firebase from "../firebase";
 
-export default class QuillEditor extends React.Component {
+export default class QuillEditor extends Component {
   constructor(props) {
     super(props);
     this.state = {
@@ -37,11 +37,11 @@ export default class QuillEditor extends React.Component {
       ]
     }; // You can also pass a Quill Delta here
   }
-
+  
   handleChange = value => {
     this.setState({ text: value });
   };
-
+  
   addDocument = () => {
     const documentsRef = firebase.database().ref("documents/" + this.props.uid);
     documentsRef
@@ -58,8 +58,9 @@ export default class QuillEditor extends React.Component {
         console.log("Document Saved");
       });
   };
-
+  
   render() {
+    console.log("render() of Editor called");
     return (
       <div className="editor">
         <label htmlFor="docName">Document Name</label>
@@ -69,6 +70,7 @@ export default class QuillEditor extends React.Component {
           }}
           id="docName"
           type="text"
+          value={this.state.name}
         />
         <ReactQuill
           value={this.state.text}

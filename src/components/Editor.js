@@ -39,7 +39,19 @@ export default class MyEditor extends Component {
       });
     });
   };
-
+  
+  addToCollection = ()=>{
+    const userCollectionsRef = firebase.database().ref(`users/${this.props.uid}/props/collections`);
+    const globalCollectionRef = firebase.database().ref("documents");
+    globalCollectionRef.add({
+      data:JSON.stringify(convertToRaw(this.state.editorState.getCurrentContent())),
+      name:this.state.docName,
+      author:this.props.user.displayName,
+      email:this.props.user.email,
+      createdOn:Date.now()
+    }).then(res=>console.log(res))
+  }
+  
   render() {
     return (
       <div className="editor border text p-4">

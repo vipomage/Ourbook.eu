@@ -7,7 +7,7 @@ export default class QuillEditor extends Component {
     super(props);
     this.state = {
       name: "",
-      text: "",
+      text: this.props.id !== ''? this.props.id: "",
       modules: {
         toolbar: [
           [{ header: [1, 2, false] }],
@@ -37,11 +37,11 @@ export default class QuillEditor extends Component {
       ]
     }; // You can also pass a Quill Delta here
   }
-  
+
   handleChange = value => {
     this.setState({ text: value });
   };
-  
+
   addDocument = () => {
     const documentsRef = firebase.database().ref("documents/" + this.props.uid);
     documentsRef
@@ -58,15 +58,31 @@ export default class QuillEditor extends Component {
         console.log("Document Saved");
       });
   };
-  
+
+  getOneDocument = (props) => {
+    firebase
+      .database()
+      .ref(`documents/${this.props.user.uid}/${props.id}`)
+      .once("value")
+      .then(obj => {
+        console.log(obj);
+        let data = obj.val();
+        console.log(data);
+        this.setState({ text: data });
+      });
+  };
+ 
   render() {
+    
     console.log("render() of Editor called");
     return (
-      <div className="editor">
+      <div className="editor-container">
         <label htmlFor="docName">Document Name</label>
         <input
           onChange={e => {
-            this.setState({ name: e.target.value });
+            this.setState({
+              name: e.target.value
+            });
           }}
           id="docName"
           type="text"

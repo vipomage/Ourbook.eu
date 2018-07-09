@@ -1,3 +1,7 @@
+.ADD_CSS {
+  outline: red 2px solid;
+}
+
 body {
   text-align: center;
   margin: 0;
@@ -81,8 +85,8 @@ body h1 em {
   color: gray;
   font-style: normal;
 }
-body .editor {
-  margin-left: 270px;
+body .editor-container {
+  margin: 30px 30px 20px 250px;
   border: 1px solid #ccc;
   cursor: text;
   min-height: 80px;

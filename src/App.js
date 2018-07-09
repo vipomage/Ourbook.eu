@@ -113,7 +113,7 @@ class App extends Component {
             userCollection={this.state.userCollection}
           />
           <main>
-            <AppRouter {...this.state} />
+            <AppRouter {...this.state}/>
           </main>
         </div>
       );

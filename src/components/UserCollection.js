@@ -11,6 +11,6 @@ export default class UserCollection extends Component {
         </li>
       );
     }
-    return <ol className="user-collection-list">{list}</ol>;
+    return <ol className="user-collection-list ADD_CSS">{list}</ol>;
   }
 }

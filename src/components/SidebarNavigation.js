@@ -11,9 +11,6 @@ export default class SidebarNavigation extends Component {
         <Link className="btn btn-primary" to="/editor">
           Quill Editor
         </Link>
-        <Link className="btn btn-primary" to="/draftEditor">
-          Draft Editor
-        </Link>
       </nav>
     );
   }

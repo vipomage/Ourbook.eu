@@ -7,7 +7,7 @@ export default class QuillEditor extends Component {
     super(props);
     this.state = {
       name: "",
-      text: this.props.id !== ''? this.props.id: "",
+      text: "",
       modules: {
         toolbar: [
           [{ header: [1, 2, false] }],
@@ -35,7 +35,8 @@ export default class QuillEditor extends Component {
         "link",
         "image"
       ]
-    }; // You can also pass a Quill Delta here
+    };
+    // You can also pass a Quill Delta here
   }
 
   handleChange = value => {
@@ -43,10 +44,12 @@ export default class QuillEditor extends Component {
   };
 
   addDocument = () => {
-    const documentsRef = firebase.database().ref("documents/" + this.props.uid);
+    const documentsRef = firebase
+      .database()
+      .ref("documents/" + this.props.user.uid);
     documentsRef
       .push({
-        ownderId: this.props.uid,
+        ownderId: this.props.user.uid,
         author: this.props.user.displayName,
         createdOn: Date.now(),
         data: this.state.text,
@@ -59,37 +62,20 @@ export default class QuillEditor extends Component {
       });
   };
 
-  getOneDocument = (props) => {
-    firebase
-      .database()
-      .ref(`documents/${this.props.user.uid}/${props.id}`)
-      .once("value")
-      .then(obj => {
-        console.log(obj);
-        let data = obj.val();
-        console.log(data);
-        this.setState({ text: data });
-      });
-  };
- 
   render() {
-    
-    console.log("render() of Editor called");
     return (
       <div className="editor-container">
         <label htmlFor="docName">Document Name</label>
         <input
           onChange={e => {
-            this.setState({
-              name: e.target.value
-            });
+            this.setState({ name: e.target.value });
           }}
-          id="docName"
           type="text"
-          value={this.state.name}
+          value={this.props.name}
         />
         <ReactQuill
-          value={this.state.text}
+          user={this.props.user}
+          value={this.props.data}
           onChange={this.handleChange}
           modules={this.state.modules}
           formats={this.state.formats}

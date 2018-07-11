@@ -1,9 +1,10 @@
 import React, { Component } from "react";
 import "./App.css";
 import { provider } from "./firebase";
-import firebase from 'firebase/app'
-import 'firebase/database';
-import 'firebase/auth'
+import database from "firebase/database";
+import firebase from "firebase/app";
+import "firebase/database";
+import "firebase/auth";
 import "react-quill/dist/quill.snow.css";
 import SignInForm from "./components/SignInForm";
 import Sidebar from "./components/Sidebar";
@@ -15,9 +16,14 @@ class App extends Component {
     this.state = {
       uid: "",
       user: firebase.auth().currentUser,
-      userCollection: {}
+      userCollection: {},
+      text: ""
     };
   }
+
+  setText = value => {
+    this.setState({ text: value });
+  };
 
   authHandler = authData => {
     let user = authData.user || authData;
@@ -39,6 +45,7 @@ class App extends Component {
           .ref("users")
           .set(obj)
           .then(() => {
+            firebase.database().goOnline();
             this.setState({
               uid: user.uid
             });
@@ -74,6 +81,7 @@ class App extends Component {
       .auth()
       .signOut()
       .then(() => {
+        firebase.database().goOffline();
         this.setState({ user: null, uid: "", dbLocation: "" });
       })
       .catch();
@@ -84,13 +92,16 @@ class App extends Component {
     firebase
       .database()
       .ref(`documents/${this.state.uid}`)
-      .once("value")
-      .then(userData => {
-        this.setState({ userCollection: userData.val()[this.state.uid] });
+      .on("value", userData => {
+        if (userData.val() !== null) {
+          this.setState({ userCollection: userData.val()[this.state.uid] });
+        } else {
+          this.setState({ userCollection: {} });
+        }
       });
   };
 
-  componentWillMount() {
+  componentDidMount() {
     firebase.auth().onAuthStateChanged(user => {
       if (user) {
         this.authHandler(user);
@@ -113,7 +124,13 @@ class App extends Component {
             userCollection={this.state.userCollection}
           />
           <main>
-            <AppRouter uid={this.state.uid} user={this.state.user} userCollection={this.state.userCollection}/>
+            <AppRouter
+              textContainer={this.state.text}
+              input={this.setText}
+              uid={this.state.uid}
+              user={this.state.user}
+              userCollection={this.state.userCollection}
+            />
           </main>
         </div>
       );

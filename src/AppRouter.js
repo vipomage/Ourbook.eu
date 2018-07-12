@@ -31,11 +31,7 @@ export default class AppRouter extends Component {
           JSON.stringify(dataSnap.val().data)
         ) {
           this.handleChange(dataSnap.val().data);
-          console.log("document set");
-        } else {
-          console.log(
-            "document already set: " + JSON.stringify(dataSnap.val())
-          );
+          this.setState({ document: dataSnap.val() });
         }
       });
   };

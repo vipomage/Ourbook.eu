@@ -24,22 +24,44 @@ export default class AppRouter extends Component {
     };
   }
 
-  toggleShareInput = e => {
+  findUserId = email => {
+    return new Promise((resolve, reject) => {
+      let ref = firebase.database().ref("users");
+      ref.once("value").then(data => {
+        let users = data.val();
+        for (const user in users) {
+          if (users[user].email === email) {
+            resolve(users[user].uid);
+          }
+        }
+        reject(null);
+      });
+    });
+  };
+
+  toggleShareInput = () => {
     $("#share-input").toggle();
   };
 
   createShare = () => {
     let userEmail = this.state.shareEmail;
-    let userId = "";
-    let obj = {};
-    //obj[ownerId] = userEmail;
-    firebase
-      .database()
-      .ref(`documents/${this.props.uid}/${this.state.docId}/sharedWith`)
-      .set(obj)
-      .then(() => {
-        //anotate share success
-      });
+    this.findUserId(userEmail).then(userId => {
+      if (userId) {
+        let obj = {};
+        obj[userId] = userEmail;
+        firebase
+          .database()
+          .ref(`documents/${this.props.uid}/${this.state.docId}/sharedWith`)
+          .set(obj)
+          .then(() => {
+            //anotate share success
+            console.log("share success");
+          })
+          .catch(() => console.log("Error occured"));
+      } else {
+        console.log("User not found!");
+      }
+    });
   };
 
   getDocumentFromDB = props => {
@@ -47,14 +69,12 @@ export default class AppRouter extends Component {
       .database()
       .ref(`documents/${this.props.user.uid}/${props.match.params.id}`)
       .on("value", dataSnap => {
-        if (
-          JSON.stringify(this.state.text) !==
-          JSON.stringify(dataSnap.val().data)
-        ) {
-          this.handleChange(dataSnap.val().data);
+        let document = dataSnap.val();
+        if (JSON.stringify(this.state.text) !== JSON.stringify(document.data)) {
+          this.handleChange(document.data);
           this.setState({
-            document: dataSnap.val(),
-            name: dataSnap.val().name,
+            document,
+            name: document.name,
             docId: props.match.params.id
           });
         }
@@ -173,6 +193,5 @@ export default class AppRouter extends Component {
     );
   }
 }
-
 
 //todo create link for blank editor

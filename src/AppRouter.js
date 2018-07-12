@@ -30,7 +30,7 @@ export default class AppRouter extends Component {
 
   createShare = () => {
     let userEmail = this.state.shareEmail;
-    let userId = '';
+    let userId = "";
     let obj = {};
     //obj[ownerId] = userEmail;
     firebase
@@ -173,3 +173,6 @@ export default class AppRouter extends Component {
     );
   }
 }
+
+
+//todo create link for blank editor

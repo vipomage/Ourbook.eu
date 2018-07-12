@@ -13,6 +13,11 @@ export default class UserCollection extends Component {
           </li>
         );
     }
-    return <ol className="user-collection-list ADD_CSS">{list}</ol>;
+    if ( list.length !== 0 ) {
+      return <ol className="user-collection-list ADD_CSS">{list}</ol>;
+    }else{
+      return <p>Empty</p>
+    }
+   
   }
 }

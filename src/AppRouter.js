@@ -17,7 +17,8 @@ export default class AppRouter extends Component {
         createdOn: "",
         email: "",
         ownerId: ""
-      }
+      },
+      docId: null
     };
   }
 
@@ -31,7 +32,11 @@ export default class AppRouter extends Component {
           JSON.stringify(dataSnap.val().data)
         ) {
           this.handleChange(dataSnap.val().data);
-          this.setState({ document: dataSnap.val() });
+          this.setState({
+            document: dataSnap.val(),
+            name:dataSnap.val().name,
+            docId: props.match.params.id
+          });
         }
       });
   };
@@ -45,7 +50,7 @@ export default class AppRouter extends Component {
             this.setState({ name: e.target.value });
           }}
           type="text"
-          defaultValue={this.state.document.name}
+          defaultValue={this.state.name}
         />
         <ReactQuill
           user={this.props.user}
@@ -54,12 +59,12 @@ export default class AppRouter extends Component {
           modules={this.state.modules}
           formats={this.state.formats}
         />
-        <button onClick={this.addDocument}>Save Doc</button>
+        <button onClick={this.saveDocument}>Save Doc</button>
       </div>
     );
   };
 
-  addDocument = () => {
+  saveDocument = () => {
     let obj = {
       ownderId: this.props.user.uid,
       author: this.props.user.displayName,
@@ -68,12 +73,27 @@ export default class AppRouter extends Component {
       email: this.props.user.email,
       name: this.state.name
     };
-    const documentsRef = firebase
-      .database()
-      .ref("documents/" + this.props.user.uid);
-    documentsRef.push(obj).then(res => {
-      //anotate saved doc
-    });
+    let docRef = `documents/${this.props.user.uid}`;
+    if (!this.state.docId) {
+      firebase
+        .database()
+        .ref(docRef)
+        .push(obj)
+        .then(res => {
+          //anotate saved doc
+        });
+    } else {
+      obj.createdOn = this.state.document.createdOn;
+      obj.lastEdit = Date.now();
+      firebase
+        .database()
+        .ref(`${docRef}/${this.state.docId}`)
+        .set(obj)
+        .then(res => {
+          //anotate updated doc
+          console.log(res);
+        });
+    }
   };
 
   handleChange = value => {

@@ -9,7 +9,7 @@ export default class SidebarNavigation extends Component {
           Home
         </Link>
         <Link className="btn btn-primary" to="/editor">
-          Quill Editor
+          Editor
         </Link>
       </nav>
     );

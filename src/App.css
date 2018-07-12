@@ -101,5 +101,19 @@ body #root > div > aside > nav {
   display: grid;
   padding: 3px;
 }
+body .doc-details {
+  display: inline-flex;
+}
+body .doc-details p {
+  margin: 5px;
+  color: blue;
+}
+body .doc-details p strong {
+  color: black;
+  text-decoration: underline;
+}
+body #share-input {
+  display: none;
+}
 
 /*# sourceMappingURL=App.css.map */

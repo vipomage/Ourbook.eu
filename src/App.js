@@ -1,7 +1,6 @@
 import React, { Component } from "react";
 import "./App.css";
 import { provider } from "./firebase";
-import database from "firebase/database";
 import firebase from "firebase/app";
 import "firebase/database";
 import "firebase/auth";
@@ -24,7 +23,7 @@ class App extends Component {
   setText = value => {
     this.setState({ text: value });
   };
-
+  
   authHandler = authData => {
     let user = authData.user || authData;
     //check if user with UID exist in users db
@@ -43,7 +42,7 @@ class App extends Component {
         firebase
           .database()
           .ref("users")
-          .set(obj)
+          .update(obj)
           .then(() => {
             firebase.database().goOnline();
             this.setState({
@@ -75,28 +74,36 @@ class App extends Component {
       .then(this.authHandler)
       .catch(e => console.log(e));
   };
-
+  
   logout = () => {
     firebase
       .auth()
       .signOut()
       .then(() => {
         firebase.database().goOffline();
-        this.setState({ user: null, uid: "", dbLocation: "" });
-      })
-      .catch();
+        this.setState({
+          uid: "",
+          userCollection: "",
+          user: firebase.auth().currentUser,
+          text: ""
+        });
+      }).then(()=>{
+      window.location.assign('/')
+    }).catch();
     //An error occurred
   };
-
+  
   getUserDocs = () => {
+    let user = firebase.auth().currentUser;
     firebase
       .database()
-      .ref(`documents/${this.state.uid}`)
+      .ref(`documents/${user.uid}`)
       .on("value", userData => {
-        if (userData.val() !== null) {
-          this.setState({ userCollection: userData.val()[this.state.uid] });
-        } else {
-          this.setState({ userCollection: {} });
+        let value = userData.val();
+        if (value) {
+          this.setState({
+            userCollection: value
+          });
         }
       });
   };
@@ -110,7 +117,7 @@ class App extends Component {
       }
     });
   }
-
+  
   render() {
     if (!this.state.user) {
       return <SignInForm {...this.state} login={this.authenticate} />;
@@ -122,6 +129,7 @@ class App extends Component {
             img={this.state.user.photoURL}
             logout={this.logout}
             userCollection={this.state.userCollection}
+            uid={this.state.uid}
           />
           <main>
             <AppRouter

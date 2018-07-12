@@ -3,6 +3,17 @@ import UserCollection from "./UserCollection";
 import SidebarNavigation from "./SidebarNavigation";
 
 export default class Sidebar extends Component {
+  constructor(props){
+    super(props);
+    this.state = {
+      collection:this.props.userCollection
+    }
+  }
+  componentDidUpdate(prevProps,prevState,snap){
+    if ( JSON.stringify(this.state.collection) !== JSON.stringify(this.props.userCollection)){
+      this.setState({collection:this.props.userCollection})
+    }
+  }
   render() {
     return (
       <aside>
@@ -15,7 +26,7 @@ export default class Sidebar extends Component {
         <SidebarNavigation />
         <div className="user-collection-container">
           <p>Your Documents</p>
-          <UserCollection userCollection={this.props.userCollection} />
+          <UserCollection userCollection={this.state.collection} />
         </div>
       </aside>
     );

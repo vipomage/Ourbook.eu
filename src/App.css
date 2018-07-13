@@ -59,6 +59,11 @@ body aside {
 }
 body aside .user-collection-container {
   border: 1px solid green;
+  text-align: center;
+}
+body aside .user-collection-container ol {
+  list-style: decimal-leading-zero;
+  text-align: justify;
 }
 body aside ul {
   color: darkgray;

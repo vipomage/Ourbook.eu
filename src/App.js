@@ -5,9 +5,14 @@ import firebase from "firebase/app";
 import "firebase/database";
 import "firebase/auth";
 import "react-quill/dist/quill.snow.css";
+import "react-notifications/lib/notifications.css";
 import SignInForm from "./components/SignInForm";
 import Sidebar from "./components/Sidebar";
 import AppRouter from "./AppRouter";
+import {
+  NotificationContainer,
+  NotificationManager
+} from "react-notifications";
 
 class App extends Component {
   constructor(props) {
@@ -21,17 +26,37 @@ class App extends Component {
     };
   }
 
+  createNotification = (type, message) => {
+    return (() => {
+      switch (type) {
+        case "info":
+          NotificationManager.info(message);
+          break;
+        case "success":
+          NotificationManager.success(message);
+          break;
+        case "warning":
+          // noinspection JSUnresolvedFunction
+          NotificationManager.warning(message);
+          break;
+        case "error":
+          NotificationManager.error(message);
+          break;
+        default:
+          NotificationManager.error("Something is Wrong");
+      }
+    })();
+  };
+
   setText = value => {
     this.setState({ text: value });
   };
-  
+
   authHandler = authData => {
     let user = authData.user || authData;
-    //check if user with UID exist in users db
     const userRef = firebase.database().ref("users/" + this.state.uid);
     userRef.once("value").then(data => {
       let userData = data.val();
-      // if not so create one
       if (!userData) {
         let uid = user.uid;
         let obj = {};
@@ -50,9 +75,7 @@ class App extends Component {
               uid: user.uid
             });
           })
-          .catch(e =>
-            console.log("Error occurred\n" + JSON.stringify(e.message))
-          );
+          .catch(e => this.createNotification("error", e.message));
       } else {
         this.setState({
           uid: user.uid
@@ -72,10 +95,13 @@ class App extends Component {
     firebase
       .auth()
       .signInWithPopup(provider)
-      .then(this.authHandler)
-      .catch(e => console.log(e));
+      .then(e => {
+        this.createNotification("success", "Login Success");
+        return this.authHandler(e);
+      })
+      .catch(e => this.createNotification("error", e.message));
   };
-  
+
   logout = () => {
     firebase
       .auth()
@@ -88,12 +114,11 @@ class App extends Component {
           user: firebase.auth().currentUser,
           text: ""
         });
-      }).then(()=>{
-      window.location.assign('/')
-    }).catch();
-    //An error occurred
+      })
+      .then(() => this.createNotification("info", "Log Out Success"))
+      .catch(e => this.createNotification("error", e.message));
   };
-  
+
   getUserDocs = () => {
     let user = firebase.auth().currentUser;
     firebase
@@ -101,30 +126,33 @@ class App extends Component {
       .ref(`documents/${user.uid}`)
       .on("value", userData => {
         let value = userData.val();
-        if (value) {
-          this.setState({
-            userCollection: value
-          });
-        }
+        this.createNotification("success", "User Documents Updated");
+        this.setState({
+          userCollection: value
+        });
       });
   };
-  
+
   getSharedDocs = () => {
     let user = firebase.auth().currentUser;
-    firebase.database().ref('documents').on('value',updatedDocs=>{
-      let docs = updatedDocs.val();
-      let sharedDocs = {};
-      for ( let valKey in docs ) {
-        let document= docs[valKey]
-        for ( let docKey in document ) {
-          let sharedIds = document[docKey].sharedWith;
-          if ( sharedIds && sharedIds.hasOwnProperty(user.uid)) {
+    firebase
+      .database()
+      .ref("documents")
+      .on("value", updatedDocs => {
+        let docs = updatedDocs.val();
+        let sharedDocs = {};
+        for (let valKey in docs) {
+          let document = docs[valKey];
+          for (let docKey in document) {
+            // noinspection JSUnresolvedVariable
+            let sharedIds = document[docKey].sharedWith;
+            if (sharedIds && sharedIds.hasOwnProperty(user.uid)) {
               sharedDocs[docKey] = document[docKey];
+            }
           }
         }
-      }
-      this.setState({sharedDocs})
-    });
+        this.setState({ sharedDocs });
+      });
   };
 
   componentDidMount() {
@@ -137,10 +165,15 @@ class App extends Component {
       }
     });
   }
-  
+
   render() {
     if (!this.state.user) {
-      return <SignInForm {...this.state} login={this.authenticate} />;
+      return (
+        <div>
+          <NotificationContainer />
+          <SignInForm {...this.state} login={this.authenticate} />
+        </div>
+      );
     } else {
       return (
         <div className="container">
@@ -153,7 +186,9 @@ class App extends Component {
             uid={this.state.uid}
           />
           <main>
+            <NotificationContainer />
             <AppRouter
+              createNotification={this.createNotification}
               textContainer={this.state.text}
               input={this.setText}
               uid={this.state.uid}

@@ -1,18 +1,21 @@
 import React, { Component } from "react";
-import UserCollection, {SharedCollection} from "./UserCollection";
+import UserCollection, { SharedCollection } from "./UserCollection";
 import SidebarNavigation from "./SidebarNavigation";
 
 export default class Sidebar extends Component {
-  constructor(props){
+  constructor(props) {
     super(props);
     this.state = {
-      collection:this.props.userCollection,
-      sharedCollection:this.props.sharedDocs
-    }
+      collection: this.props.userCollection,
+      sharedCollection: this.props.sharedDocs
+    };
   }
-  componentDidUpdate(prevProps,prevState,snap){
-    if ( JSON.stringify(this.state.collection) !== JSON.stringify(this.props.userCollection)){
-      this.setState({collection:this.props.userCollection})
+  componentDidUpdate(prevProps, prevState, snap) {
+    if (
+      JSON.stringify(this.state.collection) !==
+      JSON.stringify(this.props.userCollection)
+    ) {
+      this.setState({ collection: this.props.userCollection });
     }
   }
   render() {
@@ -29,9 +32,9 @@ export default class Sidebar extends Component {
           <p>Your Documents</p>
           <UserCollection userCollection={this.state.collection} />
         </div>
-        <div className='shared-collection-container'>
+        <div className="shared-collection-container">
           <p>Shared Documents</p>
-          <SharedCollection sharedDocs={this.props.sharedDocs}/>
+          <SharedCollection sharedDocs={this.props.sharedDocs} />
         </div>
       </aside>
     );

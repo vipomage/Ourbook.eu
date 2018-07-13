@@ -1,12 +1,13 @@
 import React, { Component } from "react";
-import UserCollection from "./UserCollection";
+import UserCollection, {SharedCollection} from "./UserCollection";
 import SidebarNavigation from "./SidebarNavigation";
 
 export default class Sidebar extends Component {
   constructor(props){
     super(props);
     this.state = {
-      collection:this.props.userCollection
+      collection:this.props.userCollection,
+      sharedCollection:this.props.sharedDocs
     }
   }
   componentDidUpdate(prevProps,prevState,snap){
@@ -27,6 +28,10 @@ export default class Sidebar extends Component {
         <div className="user-collection-container">
           <p>Your Documents</p>
           <UserCollection userCollection={this.state.collection} />
+        </div>
+        <div className='shared-collection-container'>
+          <p>Shared Documents</p>
+          <SharedCollection sharedDocs={this.props.sharedDocs}/>
         </div>
       </aside>
     );

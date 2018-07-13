@@ -16,6 +16,7 @@ class App extends Component {
       uid: "",
       user: firebase.auth().currentUser,
       userCollection: {},
+      sharedDocs: {},
       text: ""
     };
   }
@@ -107,6 +108,24 @@ class App extends Component {
         }
       });
   };
+  
+  getSharedDocs = () => {
+    let user = firebase.auth().currentUser;
+    firebase.database().ref('documents').on('value',updatedDocs=>{
+      let docs = updatedDocs.val();
+      let sharedDocs = {};
+      for ( let valKey in docs ) {
+        let document= docs[valKey]
+        for ( let docKey in document ) {
+          let sharedIds = document[docKey].sharedWith;
+          if ( sharedIds && sharedIds.hasOwnProperty(user.uid)) {
+              sharedDocs[docKey] = document[docKey];
+          }
+        }
+      }
+      this.setState({sharedDocs})
+    });
+  };
 
   componentDidMount() {
     firebase.auth().onAuthStateChanged(user => {
@@ -114,6 +133,7 @@ class App extends Component {
         this.authHandler(user);
         this.setState({ user: user });
         this.getUserDocs();
+        this.getSharedDocs();
       }
     });
   }
@@ -129,6 +149,7 @@ class App extends Component {
             img={this.state.user.photoURL}
             logout={this.logout}
             userCollection={this.state.userCollection}
+            sharedDocs={this.state.sharedDocs}
             uid={this.state.uid}
           />
           <main>

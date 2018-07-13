@@ -55,6 +55,7 @@ export default class AppRouter extends Component {
           .set(obj)
           .then(() => {
             //anotate share success
+            this.toggleShareInput();
             console.log("share success");
           })
           .catch(() => console.log("Error occured"));

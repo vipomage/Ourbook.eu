@@ -8,8 +8,8 @@ export default class SidebarNavigation extends Component {
         <Link className="btn btn-primary" to="/">
           Home
         </Link>
-        <Link className="btn btn-primary" to="/editor">
-          Editor
+        <Link className="btn btn-primary" to="/editor/new">
+          Blank Document
         </Link>
       </nav>
     );

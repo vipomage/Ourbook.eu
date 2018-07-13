@@ -6,22 +6,22 @@ import firebase from "./firebase";
 import $ from "jquery";
 
 export default class AppRouter extends Component {
+  defaultState = {
+    text: "",
+    document: {
+      name: "",
+      data: "",
+      author: "",
+      createdOn: "",
+      email: "",
+      ownerId: ""
+    },
+    docId: null,
+    shareEmail: ""
+  };
   constructor(props) {
     super(props);
-    this.state = {
-      userCollection: "",
-      text: "",
-      document: {
-        name: "",
-        data: "",
-        author: "",
-        createdOn: "",
-        email: "",
-        ownerId: ""
-      },
-      docId: null,
-      shareEmail: ""
-    };
+    this.state = this.defaultState;
   }
 
   findUserId = email => {
@@ -66,31 +66,58 @@ export default class AppRouter extends Component {
   };
 
   getDocumentFromDB = props => {
-    let document = {};
-    firebase
-      .database()
-      ///${this.props.user.uid}/${props.match.params.id}
-      .ref(`documents`)
-      .on("value", dataSnap => {
-        let users = dataSnap.val();
-        for ( let userKey in users ) {
-          let documents = users[userKey];
-          for ( let documentsKey in documents ) {
-            if ( documentsKey === props.match.params.id ) {
-              document = documents[documentsKey];
-              break;
+    return new Promise((resolve, reject) => {
+      firebase
+        .database()
+        .ref(`documents`)
+        .on("value", dataSnap => {
+          let users = dataSnap.val();
+          for (let userKey in users) {
+            let documents = users[userKey];
+            for (let documentsKey in documents) {
+              if (documentsKey === props.match.params.id) {
+                resolve(documents[documentsKey]);
+              }
             }
           }
-        }
-        if (JSON.stringify(this.state.text) !== JSON.stringify(document.data)) {
-          this.handleChange(document.data);
-          this.setState({
-            document,
-            name: document.name,
-            docId: props.match.params.id
-          });
-        }
-      });
+        });
+      reject;
+    });
+  };
+
+  saveDocument = () => {
+    let obj = {
+      ownerId: this.props.user.uid,
+      author: this.props.user.displayName,
+      createdOn: Date.now(),
+      data: this.state.text,
+      email: this.props.user.email,
+      name: this.state.name
+    };
+    let docRef = `documents/${this.props.user.uid}`;
+    if (!this.state.docId) {
+      firebase
+        .database()
+        .ref(docRef)
+        .push(obj)
+        .then(() => {
+          //anotate saved doc
+        });
+    } else {
+      obj.createdOn = this.state.document.createdOn;
+      obj.lastEdit = Date.now();
+      firebase
+        .database()
+        .ref(`${docRef}/${this.state.docId}`)
+        .update(obj)
+        .then(() => {
+          //anotate updated doc
+        });
+    }
+  };
+
+  handleChange = value => {
+    this.setState({ text: value });
   };
 
   renderEditor = () => {
@@ -116,22 +143,132 @@ export default class AppRouter extends Component {
     );
   };
 
+  clearStateAndRenderBlank = () => {
+    this.setState({ text: "" });
+
+    return (
+      <div className="editor-container">
+        <label htmlFor="docName">Document Name</label>
+        <input
+          onChange={e => {
+            this.setState({ name: e.target.value });
+          }}
+          type="text"
+          defaultValue={this.state.name}
+        />
+
+        <button onClick={this.saveDocument}>Save Doc</button>
+      </div>
+    );
+  };
+  
+
+  render() {
+    return (
+      <Switch>
+        <Route path="/editor" render={this.renderEditor} />
+        <Route path="/documents/:id" props={{...this}} component={EditorComponent} />
+        <Route path="/editor/new" render={this.clearStateAndRenderBlank} />
+        <Route component={Welcome} />
+      </Switch>
+    );
+  }
+}
+
+
+class EditorComponent extends React.Component {
+  constructor(props) {
+    super(props);
+    this.state = { text: '',document: {
+        name: "",
+        data: "",
+        author: "",
+        createdOn: "",
+        email: "",
+        ownerId: ""
+      },docId:'',
+    user:firebase.auth().currentUser}; // You can also pass a Quill Delta here
+    this.handleChange = this.handleChange.bind(this);
+  }
+  
+  findUserId = email => {
+    return new Promise((resolve, reject) => {
+      let ref = firebase.database().ref("users");
+      ref.once("value").then(data => {
+        let users = data.val();
+        for (const user in users) {
+          if (users[user].email === email) {
+            resolve(users[user].uid);
+          }
+        }
+        reject(null);
+      });
+    });
+  };
+  
+  toggleShareInput = () => {
+    $("#share-input").toggle();
+  };
+  
+  createShare = () => {
+    let userEmail = this.state.shareEmail;
+    this.findUserId(userEmail).then(userId => {
+      if (userId) {
+        let obj = {};
+        obj[userId] = userEmail;
+        firebase
+          .database()
+          .ref(`documents/${this.state.user.uid}/${this.state.docId}/sharedWith`)
+          .set(obj)
+          .then(() => {
+            //anotate share success
+            this.toggleShareInput();
+            console.log("share success");
+          })
+          .catch(() => console.log("Error occured"));
+      } else {
+        console.log("User not found!");
+      }
+    });
+  };
+  
+  getDocumentFromDB = props => {
+    return new Promise((resolve, reject) => {
+      firebase
+        .database()
+        .ref(`documents`)
+        .on("value", dataSnap => {
+          let users = dataSnap.val();
+          for (let userKey in users) {
+            let documents = users[userKey];
+            for (let documentsKey in documents) {
+              if (documentsKey === props.match.params.id) {
+                let document = documents[documentsKey];
+                this.handleChange(document.data);
+                return resolve(document);
+              }
+            }
+          }
+        });
+    });
+  };
+  
   saveDocument = () => {
     let obj = {
-      ownerId: this.props.user.uid,
-      author: this.props.user.displayName,
+      ownerId: this.state.user.uid,
+      author: this.state.user.displayName,
       createdOn: Date.now(),
       data: this.state.text,
-      email: this.props.user.email,
-      name: this.state.name
+      email: this.state.user.email,
+      name: this.state.document.name
     };
-    let docRef = `documents/${this.props.user.uid}`;
+    let docRef = `documents/${this.state.user.uid}`;
     if (!this.state.docId) {
       firebase
         .database()
         .ref(docRef)
         .push(obj)
-        .then(res => {
+        .then(() => {
           //anotate saved doc
         });
     } else {
@@ -140,20 +277,32 @@ export default class AppRouter extends Component {
       firebase
         .database()
         .ref(`${docRef}/${this.state.docId}`)
-        .set(obj)
-        .then(res => {
+        .update(obj)
+        .then(() => {
           //anotate updated doc
-          console.log(res);
         });
     }
   };
+  
+  componentDidMount(){
+    this.getDocumentFromDB(this.props).then(document=>{
+      this.setState({text:document.data,document:document,docId:this.props.match.params.id})
+    })
+  }
+  
+  componentDidUpdate(prevP,prevS,snap){
+    if ( JSON.stringify(prevP) !== JSON.stringify(this.props) ) {
+      this.getDocumentFromDB(this.props).then(document=>{
+        this.setState({text:document.data,document:document,docId:this.props.match.params.id})
+      })
+    }
+  }
 
-  handleChange = value => {
-    this.setState({ text: value });
-  };
+  handleChange(value) {
+    this.setState({ text: value});
+  }
 
-  getDocAndRenderEditor = props => {
-    this.getDocumentFromDB(props);
+  render() {
     return (
       <div className="editor-container">
         <div className="doc-details">
@@ -174,9 +323,6 @@ export default class AppRouter extends Component {
           <button className="btn btn-warning" onClick={this.toggleShareInput}>
             Share
           </button>
-          <Link className="btn btn-primary" to="/editor">
-            Edit
-          </Link>
         </div>
         <div id="share-input">
           <input
@@ -190,20 +336,12 @@ export default class AppRouter extends Component {
             Create Share
           </button>
         </div>
-        <ReactQuill user={this.props.user} value={this.state.text} />
+        <ReactQuill value={this.state.text} onChange={this.handleChange}/>
+        <button onClick={this.saveDocument}>Save Doc</button>
       </div>
-    );
-  };
-
-  render() {
-    return (
-      <Switch>
-        <Route path="/editor" render={this.renderEditor} />
-        <Route path="/documents/:id" render={this.getDocAndRenderEditor} />
-        <Route component={Welcome} />
-      </Switch>
     );
   }
 }
 
-//todo create link for blank editor
+//todo fix save on blank documents in editorComponent
+//todo fix realtimeDB for document contents

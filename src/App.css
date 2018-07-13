@@ -105,7 +105,7 @@ body .doc-details {
   display: inline-flex;
 }
 body .doc-details p {
-  margin: 5px;
+  margin: 15px;
   color: blue;
 }
 body .doc-details p strong {
@@ -114,6 +114,9 @@ body .doc-details p strong {
 }
 body #share-input {
   display: none;
+}
+body .buttons-container .btn {
+  margin: 5px;
 }
 
 /*# sourceMappingURL=App.css.map */

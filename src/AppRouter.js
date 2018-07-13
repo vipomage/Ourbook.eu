@@ -66,11 +66,22 @@ export default class AppRouter extends Component {
   };
 
   getDocumentFromDB = props => {
+    let document = {};
     firebase
       .database()
-      .ref(`documents/${this.props.user.uid}/${props.match.params.id}`)
+      ///${this.props.user.uid}/${props.match.params.id}
+      .ref(`documents`)
       .on("value", dataSnap => {
-        let document = dataSnap.val();
+        let users = dataSnap.val();
+        for ( let userKey in users ) {
+          let documents = users[userKey];
+          for ( let documentsKey in documents ) {
+            if ( documentsKey === props.match.params.id ) {
+              document = documents[documentsKey];
+              break;
+            }
+          }
+        }
         if (JSON.stringify(this.state.text) !== JSON.stringify(document.data)) {
           this.handleChange(document.data);
           this.setState({

@@ -5,7 +5,25 @@ import ReactQuill from 'react-quill';
 import firebase from './firebase';
 import $ from 'jquery';
 import { NotificationManager } from 'react-notifications';
-
+const toolbarOptions = [
+  ['bold', 'italic', 'underline', 'strike'],        // toggled buttons
+  ['blockquote', 'code-block'],
+  
+  [{ 'header': 1 }, { 'header': 2 }],               // custom button values
+  [{ 'list': 'ordered'}, { 'list': 'bullet' }],
+  [{ 'script': 'sub'}, { 'script': 'super' }],      // superscript/subscript
+  [{ 'indent': '-1'}, { 'indent': '+1' }],          // outdent/indent
+  [{ 'direction': 'rtl' }],                         // text direction
+  
+  [{ 'size': ['small', false, 'large', 'huge'] }],  // custom dropdown
+  [{ 'header': [1, 2, 3, 4, 5, 6, false] }],
+  
+  [{ 'color': [] }, { 'background': [] }],          // dropdown with defaults from theme
+  [{ 'font': [] }],
+  [{ 'align': [] }],
+  
+  ['clean']                                         // remove formatting button
+];
 export default class AppRouter extends Component {
 	defaultState = {
 		text: '',
@@ -24,29 +42,6 @@ export default class AppRouter extends Component {
 		super(props);
 		this.state = this.defaultState;
 	}
-
-	renderEditor = () => {
-		return (
-			<div className="editor-container">
-				<label htmlFor="docName">Document Name</label>
-				<input
-					onChange={e => {
-						this.setState({ name: e.target.value });
-					}}
-					type="text"
-					defaultValue={this.state.name}
-				/>
-				<ReactQuill
-					user={this.props.user}
-					value={this.state.text}
-					onChange={this.handleChange}
-					modules={this.state.modules}
-					formats={this.state.formats}
-				/>
-				<button onClick={this.saveDocument}>Save Doc</button>
-			</div>
-		);
-	};
 
 	render() {
 		return (
@@ -67,6 +62,8 @@ export default class AppRouter extends Component {
 	}
 }
 
+
+
 class EditorComponent extends React.Component {
 	constructor(props) {
 		super(props);
@@ -84,6 +81,25 @@ class EditorComponent extends React.Component {
 			user: firebase.auth().currentUser
 		};
 		this.handleChange = this.handleChange.bind(this);
+		this.toolbarOptions = [
+      ['bold', 'italic', 'underline', 'strike'],        // toggled buttons
+      ['blockquote', 'code-block'],
+      
+      [{ 'header': 1 }, { 'header': 2 }],               // custom button values
+      [{ 'list': 'ordered'}, { 'list': 'bullet' }],
+      [{ 'script': 'sub'}, { 'script': 'super' }],      // superscript/subscript
+      [{ 'indent': '-1'}, { 'indent': '+1' }],          // outdent/indent
+      [{ 'direction': 'rtl' }],                         // text direction
+      
+      [{ 'size': ['small', false, 'large', 'huge'] }],  // custom dropdown
+      [{ 'header': [1, 2, 3, 4, 5, 6, false] }],
+      
+      [{ 'color': [] }, { 'background': [] }],          // dropdown with defaults from theme
+      [{ 'font': [] }],
+      [{ 'align': [] }],
+      
+      ['clean']                                         // remove formatting button
+    ];
 	}
 
 	createNotification = (type, message) => {
@@ -182,21 +198,28 @@ class EditorComponent extends React.Component {
 			email: this.state.user.email,
 			name: this.state.document.name
 		};
-		let docRef = `documents/${this.state.user.uid}`;
-		if (!this.state.docId) {
-			firebase
-				.database()
-				.ref(docRef)
-				.push(obj)
-				.catch(e => this.createNotification('error', e.message));
+		if (this.state.document.name === '' || this.state.document.name === '') {
+			debugger;
+			this.createNotification('error', 'Please provide document name');
+			$('input#document-name').css({ outline: '1px solid red' });
 		} else {
-			obj.createdOn = this.state.document.createdOn;
-			obj.lastEdit = Date.now();
-			firebase
-				.database()
-				.ref(`${docRef}/${this.state.docId}`)
-				.update(obj)
-				.catch(e => this.createNotification('error', e.message));
+			$('input#document-name').css({ outline: '0px solid red' });
+			let docRef = `documents/${this.state.user.uid}`;
+			if (!this.state.docId) {
+				firebase
+					.database()
+					.ref(docRef)
+					.push(obj)
+					.catch(e => this.createNotification('error', e.message));
+			} else {
+				obj.createdOn = this.state.document.createdOn;
+				obj.lastEdit = Date.now();
+				firebase
+					.database()
+					.ref(`${docRef}/${this.state.docId}`)
+					.update(obj)
+					.catch(e => this.createNotification('error', e.message));
+			}
 		}
 	};
 
@@ -268,7 +291,7 @@ class EditorComponent extends React.Component {
 						Create Share
 					</button>
 				</div>
-				<ReactQuill value={this.state.text} onChange={this.handleChange} />
+				<ReactQuill modules={{toolbar:this.toolbarOptions}} value={this.state.text} onChange={this.handleChange} />
 				<button onClick={this.saveDocument}>Save Doc</button>
 			</div>
 		);
@@ -292,8 +315,48 @@ class EmptyEditorComponent extends React.Component {
 			user: firebase.auth().currentUser
 		};
 		this.handleChange = this.handleChange.bind(this);
+    this.toolbarOptions = [
+      ['bold', 'italic', 'underline', 'strike'],        // toggled buttons
+      ['blockquote', 'code-block'],
+      
+      [{ 'header': 1 }, { 'header': 2 }],               // custom button values
+      [{ 'list': 'ordered'}, { 'list': 'bullet' }],
+      [{ 'script': 'sub'}, { 'script': 'super' }],      // superscript/subscript
+      [{ 'indent': '-1'}, { 'indent': '+1' }],          // outdent/indent
+      [{ 'direction': 'rtl' }],                         // text direction
+      
+      [{ 'size': ['small', false, 'large', 'huge'] }],  // custom dropdown
+      [{ 'header': [1, 2, 3, 4, 5, 6, false] }],
+      
+      [{ 'color': [] }, { 'background': [] }],          // dropdown with defaults from theme
+      [{ 'font': [] }],
+      [{ 'align': [] }],
+      
+      ['clean']                                         // remove formatting button
+    ];
 	}
 
+	createNotification = (type, message) => {
+		return (() => {
+			switch (type) {
+				case 'info':
+					NotificationManager.info(message);
+					break;
+				case 'success':
+					NotificationManager.success(message);
+					break;
+				case 'warning':
+					// noinspection JSUnresolvedFunction
+					NotificationManager.warning(message);
+					break;
+				case 'error':
+					NotificationManager.error(message);
+					break;
+				default:
+					NotificationManager.error('Something is Wrong');
+			}
+		})();
+	};
 	saveDocument = () => {
 		let obj = {
 			ownerId: this.state.user.uid,
@@ -304,38 +367,44 @@ class EmptyEditorComponent extends React.Component {
 			name: this.state.document.name
 		};
 		let docRef = `documents/${this.state.user.uid}`;
-		if (!this.state.docId) {
-			firebase
-				.database()
-				.ref(docRef)
-				.push(obj)
-				.then(() => {});
+		if (this.state.document.name === '') {
+			this.createNotification('error', 'Please provide document name');
+			$('input#document-name').css({ outline: '1px solid red' });
 		} else {
-			obj.createdOn = this.state.document.createdOn;
-			obj.lastEdit = Date.now();
-			firebase
-				.database()
-				.ref(`${docRef}/${this.state.docId}`)
-				.update(obj)
-				.then(() => {});
+			$('input#document-name').css({ outline: '0px solid red' });
+			if (!this.state.docId) {
+				firebase
+					.database()
+					.ref(docRef)
+					.push(obj)
+					.then(() => {});
+			} else {
+				obj.createdOn = this.state.document.createdOn;
+				obj.lastEdit = Date.now();
+				firebase
+					.database()
+					.ref(`${docRef}/${this.state.docId}`)
+					.update(obj)
+					.then(() => {});
+			}
 		}
 	};
 
 	handleChange(value) {
 		this.setState({ text: value });
 	}
+
 	render() {
 		return (
 			<div className="editor-container">
 				<input
+					id="document-name"
 					onChange={e => this.setState({ document: { name: e.target.value } })}
 					placeholder="Document Name"
-					defaultValue="Document Name"
 					type="text"
 				/>
 
-				<ReactQuill value={this.state.text} onChange={this.handleChange} />
-
+				<ReactQuill modules={{toolbar:this.toolbarOptions}} value={this.state.text} onChange={this.handleChange} />
 				<button onClick={this.saveDocument}>Save Doc</button>
 			</div>
 		);

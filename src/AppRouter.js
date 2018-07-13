@@ -344,4 +344,3 @@ class EditorComponent extends React.Component {
 }
 
 //todo fix save on blank documents in editorComponent
-//todo fix realtimeDB for document contents

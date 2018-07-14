@@ -1,0 +1,24 @@
+{
+	"backup": {
+      "rules": {
+        "documents": {
+          "$userUid": {
+            ".read": "auth != null",
+            "$docId":{
+              ".write": "auth != null && data.child('sharedWith').hasChild(auth.uid)"
+            }
+          }
+        },
+        "users": {
+          ".read": "auth != null",
+          ".write": "auth != null"
+        }
+      }
+    },
+	"default": {
+		"rules": {
+			".read": "auth != null",
+			".write": "auth != null"
+		}
+	}
+}

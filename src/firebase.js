@@ -10,6 +10,13 @@ const config = {
 };
 firebase.initializeApp(config);
 
+firebase
+  .auth()
+  .setPersistence(firebase.auth.Auth.Persistence.SESSION)
+  .then(function() {
+    return firebase.auth().signInWithPopup;
+  });
+
 export const provider = new firebase.auth.GoogleAuthProvider();
 
 export default firebase;

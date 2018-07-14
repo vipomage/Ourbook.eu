@@ -54,7 +54,7 @@ class App extends Component {
 
 	authHandler = authData => {
 		let user = authData.user || authData;
-		const userRef = firebase.database().ref('users/' + this.state.uid);
+		const userRef = firebase.database().ref('users/' + user.uid);
 		userRef.once('value').then(data => {
 			let userData = data.val();
 			if (!userData) {
@@ -78,7 +78,7 @@ class App extends Component {
 					.catch(e => this.createNotification('error', e.message));
 			} else {
 				this.setState({
-					uid: user.uid
+					uid: user.uid,isAdmin:userData.admin||false
 				});
 			}
 		});
@@ -87,17 +87,10 @@ class App extends Component {
 	authenticate = () => {
 		firebase
 			.auth()
-			.setPersistence(firebase.auth.Auth.Persistence.SESSION)
-			.then(function() {
-				return firebase.auth().signInWithPopup;
-			});
-
-		firebase
-			.auth()
 			.signInWithPopup(provider)
 			.then(e => {
 				this.createNotification('success', 'Login Success');
-				return this.authHandler(e);
+				this.authHandler(e);
 			})
 			.catch(e => this.createNotification('error', e.message));
 	};
@@ -126,8 +119,7 @@ class App extends Component {
 			.ref(`documents/${user.uid}`)
 			.on('value', userData => {
 				let value = userData.val();
-				this.createNotification('success', 'User Documents Updated');
-				this.setState({
+        this.setState({
 					userCollection: value
 				});
 			});

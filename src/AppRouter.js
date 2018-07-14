@@ -5,25 +5,7 @@ import ReactQuill from 'react-quill';
 import firebase from './firebase';
 import $ from 'jquery';
 import { NotificationManager } from 'react-notifications';
-const toolbarOptions = [
-  ['bold', 'italic', 'underline', 'strike'],        // toggled buttons
-  ['blockquote', 'code-block'],
-  
-  [{ 'header': 1 }, { 'header': 2 }],               // custom button values
-  [{ 'list': 'ordered'}, { 'list': 'bullet' }],
-  [{ 'script': 'sub'}, { 'script': 'super' }],      // superscript/subscript
-  [{ 'indent': '-1'}, { 'indent': '+1' }],          // outdent/indent
-  [{ 'direction': 'rtl' }],                         // text direction
-  
-  [{ 'size': ['small', false, 'large', 'huge'] }],  // custom dropdown
-  [{ 'header': [1, 2, 3, 4, 5, 6, false] }],
-  
-  [{ 'color': [] }, { 'background': [] }],          // dropdown with defaults from theme
-  [{ 'font': [] }],
-  [{ 'align': [] }],
-  
-  ['clean']                                         // remove formatting button
-];
+
 export default class AppRouter extends Component {
 	defaultState = {
 		text: '',
@@ -62,8 +44,6 @@ export default class AppRouter extends Component {
 	}
 }
 
-
-
 class EditorComponent extends React.Component {
 	constructor(props) {
 		super(props);
@@ -82,24 +62,24 @@ class EditorComponent extends React.Component {
 		};
 		this.handleChange = this.handleChange.bind(this);
 		this.toolbarOptions = [
-      ['bold', 'italic', 'underline', 'strike'],        // toggled buttons
-      ['blockquote', 'code-block'],
-      
-      [{ 'header': 1 }, { 'header': 2 }],               // custom button values
-      [{ 'list': 'ordered'}, { 'list': 'bullet' }],
-      [{ 'script': 'sub'}, { 'script': 'super' }],      // superscript/subscript
-      [{ 'indent': '-1'}, { 'indent': '+1' }],          // outdent/indent
-      [{ 'direction': 'rtl' }],                         // text direction
-      
-      [{ 'size': ['small', false, 'large', 'huge'] }],  // custom dropdown
-      [{ 'header': [1, 2, 3, 4, 5, 6, false] }],
-      
-      [{ 'color': [] }, { 'background': [] }],          // dropdown with defaults from theme
-      [{ 'font': [] }],
-      [{ 'align': [] }],
-      
-      ['clean']                                         // remove formatting button
-    ];
+			['bold', 'italic', 'underline', 'strike'], // toggled buttons
+			['blockquote', 'code-block'],
+
+			[{ header: 1 }, { header: 2 }], // custom button values
+			[{ list: 'ordered' }, { list: 'bullet' }],
+			[{ script: 'sub' }, { script: 'super' }], // superscript/subscript
+			[{ indent: '-1' }, { indent: '+1' }], // outdent/indent
+			[{ direction: 'rtl' }], // text direction
+
+			[{ size: ['small', false, 'large', 'huge'] }], // custom dropdown
+			[{ header: [1, 2, 3, 4, 5, 6, false] }],
+
+			[{ color: [] }, { background: [] }], // dropdown with defaults from theme
+			[{ font: [] }],
+			[{ align: [] }],
+
+			['clean'] // remove formatting button
+		];
 	}
 
 	createNotification = (type, message) => {
@@ -195,11 +175,10 @@ class EditorComponent extends React.Component {
 			author: this.state.user.displayName,
 			createdOn: Date.now(),
 			data: this.state.text,
-			email: this.state.user.email,
+			email: this.state.document.email,
 			name: this.state.document.name
 		};
-		if (this.state.document.name === '' || this.state.document.name === '') {
-			debugger;
+		if (this.state.document.name === '') {
 			this.createNotification('error', 'Please provide document name');
 			$('input#document-name').css({ outline: '1px solid red' });
 		} else {
@@ -212,13 +191,16 @@ class EditorComponent extends React.Component {
 					.push(obj)
 					.catch(e => this.createNotification('error', e.message));
 			} else {
+				obj.author = this.state.document.author;
 				obj.createdOn = this.state.document.createdOn;
 				obj.lastEdit = Date.now();
+				obj.editor = this.state.user.email;
+
 				firebase
 					.database()
-					.ref(`${docRef}/${this.state.docId}`)
+					.ref(`documents/${this.state.document.ownerId}/${this.state.docId}`)
 					.update(obj)
-					.catch(e => this.createNotification('error', e.message));
+					.catch(e => this.createNotification('error', 'You are not allowed to save on this document!'));
 			}
 		}
 	};
@@ -257,21 +239,14 @@ class EditorComponent extends React.Component {
 						Name: <strong>{this.state.document.name}</strong>
 					</p>
 					<p>
-						Created:{' '}
-						<strong>
-							{new Date(this.state.document.createdOn).toDateString()}
-						</strong>
+						Created: <strong>{new Date(this.state.document.createdOn).toDateString()}</strong>
 					</p>
 					<p>
 						Author: <strong>{this.state.document.email}</strong>
 					</p>
 					<p>
-						Last Edit:{' '}
-						<strong>
-							{this.state.document.lastEdit
-								? new Date(this.state.document.lastEdit).toDateString()
-								: 'N/A'}
-						</strong>
+						Last Edit:<strong>{this.state.document.lastEdit? new Date(this.state.document.lastEdit).toDateString(): 'N/A'}</strong><br/>
+						Editor:<strong>{this.state.document.editor}</strong>
 					</p>
 				</div>
 				<div className="buttons-container">
@@ -291,7 +266,11 @@ class EditorComponent extends React.Component {
 						Create Share
 					</button>
 				</div>
-				<ReactQuill modules={{toolbar:this.toolbarOptions}} value={this.state.text} onChange={this.handleChange} />
+				<ReactQuill
+					modules={{ toolbar: this.toolbarOptions }}
+					value={this.state.text}
+					onChange={this.handleChange}
+				/>
 				<button onClick={this.saveDocument}>Save Doc</button>
 			</div>
 		);
@@ -315,25 +294,25 @@ class EmptyEditorComponent extends React.Component {
 			user: firebase.auth().currentUser
 		};
 		this.handleChange = this.handleChange.bind(this);
-    this.toolbarOptions = [
-      ['bold', 'italic', 'underline', 'strike'],        // toggled buttons
-      ['blockquote', 'code-block'],
-      
-      [{ 'header': 1 }, { 'header': 2 }],               // custom button values
-      [{ 'list': 'ordered'}, { 'list': 'bullet' }],
-      [{ 'script': 'sub'}, { 'script': 'super' }],      // superscript/subscript
-      [{ 'indent': '-1'}, { 'indent': '+1' }],          // outdent/indent
-      [{ 'direction': 'rtl' }],                         // text direction
-      
-      [{ 'size': ['small', false, 'large', 'huge'] }],  // custom dropdown
-      [{ 'header': [1, 2, 3, 4, 5, 6, false] }],
-      
-      [{ 'color': [] }, { 'background': [] }],          // dropdown with defaults from theme
-      [{ 'font': [] }],
-      [{ 'align': [] }],
-      
-      ['clean']                                         // remove formatting button
-    ];
+		this.toolbarOptions = [
+			['bold', 'italic', 'underline', 'strike'], // toggled buttons
+			['blockquote', 'code-block'],
+
+			[{ header: 1 }, { header: 2 }], // custom button values
+			[{ list: 'ordered' }, { list: 'bullet' }],
+			[{ script: 'sub' }, { script: 'super' }], // superscript/subscript
+			[{ indent: '-1' }, { indent: '+1' }], // outdent/indent
+			[{ direction: 'rtl' }], // text direction
+
+			[{ size: ['small', false, 'large', 'huge'] }], // custom dropdown
+			[{ header: [1, 2, 3, 4, 5, 6, false] }],
+
+			[{ color: [] }, { background: [] }], // dropdown with defaults from theme
+			[{ font: [] }],
+			[{ align: [] }],
+
+			['clean'] // remove formatting button
+		];
 	}
 
 	createNotification = (type, message) => {
@@ -404,7 +383,11 @@ class EmptyEditorComponent extends React.Component {
 					type="text"
 				/>
 
-				<ReactQuill modules={{toolbar:this.toolbarOptions}} value={this.state.text} onChange={this.handleChange} />
+				<ReactQuill
+					modules={{ toolbar: this.toolbarOptions }}
+					value={this.state.text}
+					onChange={this.handleChange}
+				/>
 				<button onClick={this.saveDocument}>Save Doc</button>
 			</div>
 		);

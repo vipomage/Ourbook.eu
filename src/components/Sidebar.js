@@ -27,7 +27,7 @@ export default class Sidebar extends Component {
 				<button className="btn btn-warning" onClick={this.props.logout}>
 					Log out
 				</button>
-				<SidebarNavigation />
+				<SidebarNavigation isAdmin={this.props.isAdmin} />
 				<div className="user-collection-container">
 					<p>Your Documents</p>
 					<UserCollection userCollection={this.state.collection} />

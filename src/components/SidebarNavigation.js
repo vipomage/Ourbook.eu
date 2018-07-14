@@ -11,6 +11,7 @@ export default class SidebarNavigation extends Component {
 				<Link className="btn btn-primary" to="/editor/new">
 					Blank Document
 				</Link>
+        {this.props.isAdmin ? <Link to='/adminPanel' className='btn btn-danger'>Admin CP</Link>:''}
 			</nav>
 		);
 	}

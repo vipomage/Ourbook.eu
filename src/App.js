@@ -54,36 +54,45 @@ class App extends Component {
 
 	authHandler = authData => {
 		let user = authData.user || authData;
-		const userRef = firebase.database().ref('users/' + user.uid);
-		userRef.once('value').then(data => {
-			let userData = data.val();
-			if (!userData) {
-				let uid = user.uid;
-				let obj = {};
-				obj[uid] = {
-					displayName: user.displayName,
-					email: user.email,
-					uid
-				};
-				firebase
-					.database()
-					.ref('users')
-					.update(obj)
-					.then(() => {
-						firebase.database().goOnline();
-						this.setState({
-							uid: user.uid
-						});
-					})
-					.catch(e => this.createNotification('error', e.message));
-			} else {
-				this.setState({
-					uid: user.uid,isAdmin:userData.admin||false
-				});
-			}
+		let isAdmin = this.isAdmin(user.uid);
+		isAdmin.then(status=>{
+      firebase.database().ref('users/' + user.uid)
+        .once('value').then( data => {
+        let userData = data.val();
+        if ( !userData ) {
+          let uid = user.uid;
+          let obj = {};
+          obj[ uid ] = {
+            displayName: user.displayName,
+            email: user.email,
+            uid
+          };
+          firebase
+            .database()
+            .ref('users')
+            .update(obj)
+            .then(() => {
+            firebase.database().goOnline();
+            this.setState({
+              uid: user.uid,isAdmin:status
+            });
+          })
+            .catch(e => this.createNotification('error', e.message));
+        } else {
+          this.setState({uid: user.uid,isAdmin:status});
+        }
+      });
 		});
 	};
-
+	
+	isAdmin = (uid) => new Promise(resolve => {
+    firebase.database().ref(`admins/${uid}`)
+			.once('value').then(t=>{
+      resolve(t.val());
+    });
+    
+	});
+	
 	authenticate = () => {
 		firebase
 			.auth()
@@ -105,7 +114,8 @@ class App extends Component {
 					uid: '',
 					userCollection: '',
 					user: firebase.auth().currentUser,
-					text: ''
+					text: '',
+					isAdmin:null
 				});
 			})
 			.then(() => this.createNotification('info', 'Log Out Success'))
@@ -116,7 +126,7 @@ class App extends Component {
 		let user = firebase.auth().currentUser;
 		firebase
 			.database()
-			.ref(`documents/${user.uid}`)
+			.ref(`documents/${user.uid}`).orderByChild('createdOn')
 			.on('value', userData => {
 				let value = userData.val();
         this.setState({
@@ -154,6 +164,10 @@ class App extends Component {
 				this.setState({ user: user });
 				this.getUserDocs();
 				this.getSharedDocs();
+        this.isAdmin(user.uid).then(result=>{
+          console.log(result);
+          this.setState({isAdmin:result})
+        })
 			}
 		});
 	}
@@ -176,6 +190,7 @@ class App extends Component {
 						userCollection={this.state.userCollection}
 						sharedDocs={this.state.sharedDocs}
 						uid={this.state.uid}
+						isAdmin={this.state.isAdmin}
 					/>
 					<main>
 						<NotificationContainer />

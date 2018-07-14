@@ -123,5 +123,9 @@ body #share-input {
 body .buttons-container .btn {
   margin: 5px;
 }
+body .admin-panel {
+  width: 150px;
+  margin-left: 100px;
+}
 
 /*# sourceMappingURL=App.css.map */

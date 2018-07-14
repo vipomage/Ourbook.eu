@@ -1,24 +1,70 @@
 {
-	"backup": {
-      "rules": {
-        "documents": {
-          "$userUid": {
-            ".read": "auth != null",
-            "$docId":{
-              ".write": "auth != null && data.child('sharedWith').hasChild(auth.uid)"
-            }
-          }
-        },
-        "users": {
-          ".read": "auth != null",
-          ".write": "auth != null"
-        }
-      }
-    },
-	"default": {
+	"latest": {
 		"rules": {
-			".read": "auth != null",
-			".write": "auth != null"
+			"admins": {
+				//Disable any outside Write to Admin Collection
+				".write": false,
+				//Read if authenticated (does not matter since rules are checked internally for matching Uid)
+				".read": "auth !==null"
+			},
+			// Global Read  for Admins
+			".read": "auth !== null && root.child('admins').hasChild(auth.uid)",
+			// Global Write for Admins
+			".write": "auth !== null && root.child('admins').hasChild(auth.uid)",
+			"documents": {
+				//Read if Authenticated
+				".read": "auth !== null",
+				"$userUid": {
+					//Read if Authenticated
+					".read": "auth !== null",
+					//Write if Uid of collection matches user Uid
+					".write": "$userUid === auth.uid",
+					"$docId": {
+						//Override Write rule on documents that have sharedWith prop that matches user UID
+						".write":
+							"(auth !== null && data.child('sharedWith').hasChild(auth.uid))",
+						//Validation for new Documents
+						".validate":
+							"newData.hasChildren(['name','data','author','createdOn','email','ownerId'])"
+					}
+				}
+			},
+			"users": {
+				//Public Readability for Link shares on Docs (Writes are controlled on line: 20 & 22)
+				".read": "auth != null",
+				"$userUid": {
+					//User can write only on his collection
+					".write": "auth != null && $userUid === auth.uid"
+				}
+			}
 		}
+	},
+	"backup": {
+		"rules": {
+			"admins": {
+				".write": false,
+				".read": "auth !==null"
+			},
+			"documents": {
+				".read": "auth !== null || root.child('admins').hasChild(auth.uid)",
+				"$userUid": {
+					".read": "auth !== null",
+					".write":
+						"$userUid === auth.uid || root.child('admins').hasChild(auth.uid)",
+					"$docId": {
+						".write":
+							"(auth !== null && data.child('sharedWith').hasChild(auth.uid))||root.child('admins').hasChild(auth.uid)"
+					}
+				}
+			},
+			"users": {
+				".read": "auth != null",
+				".write": "auth != null"
+			}
+		}
+	},
+	"users": {
+		".read": "auth != null",
+		".write": "auth != null"
 	}
 }

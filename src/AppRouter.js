@@ -5,24 +5,24 @@ import ReactQuill from 'react-quill';
 import firebase from './firebase';
 import $ from 'jquery';
 import { NotificationManager } from 'react-notifications';
+import UserCollection from './components/UserCollection';
 
 export default class AppRouter extends Component {
-	defaultState = {
-		text: '',
-		document: {
-			name: '',
-			data: '',
-			author: '',
-			createdOn: '',
-			email: '',
-			ownerId: ''
-		},
-		docId: null,
-		shareEmail: ''
-	};
 	constructor(props) {
 		super(props);
-		this.state = this.defaultState;
+		this.state = {
+			text: '',
+			document: {
+				name: '',
+				data: '',
+				author: '',
+				createdOn: '',
+				email: '',
+				ownerId: ''
+			},
+			docId: null,
+			shareEmail: ''
+		};
 	}
 
 	render() {
@@ -38,13 +38,14 @@ export default class AppRouter extends Component {
 					props={{ ...this }}
 					component={EmptyEditorComponent}
 				/>
+				<Route path="/adminPanel" exact={true} component={AdminPanel} />
 				<Route component={Welcome} />
 			</Switch>
 		);
 	}
 }
 
-class EditorComponent extends React.Component {
+class EditorComponent extends Component {
 	constructor(props) {
 		super(props);
 		this.state = {
@@ -170,13 +171,14 @@ class EditorComponent extends React.Component {
 	};
 
 	saveDocument = () => {
+		$('#new-name-input').hide();
 		let obj = {
 			ownerId: this.state.user.uid,
 			author: this.state.user.displayName,
 			createdOn: Date.now(),
 			data: this.state.text,
 			email: this.state.document.email,
-			name: this.state.document.name
+			name: this.state.name ? this.state.name : this.state.document.name
 		};
 		if (this.state.document.name === '') {
 			this.createNotification('error', 'Please provide document name');
@@ -200,9 +202,29 @@ class EditorComponent extends React.Component {
 					.database()
 					.ref(`documents/${this.state.document.ownerId}/${this.state.docId}`)
 					.update(obj)
-					.catch(e => this.createNotification('error', 'You are not allowed to save on this document!'));
+					.catch(e =>
+						this.createNotification(
+							'error',
+							'You are not allowed to save on this document!'
+						)
+					);
 			}
 		}
+	};
+
+	deleteItem = () => {
+		let quest = window.confirm('Do you really want to delete the Document?');
+		if (quest)
+			firebase
+				.database()
+				.ref(`documents/${this.state.document.ownerId}/${this.state.docId}`)
+				.remove(() => {
+					this.createNotification('success', 'Document Deleted');
+					window.history.back();
+				})
+				.catch(e =>
+					this.createNotification('error', e.message || 'Something is Wrong')
+				);
 	};
 
 	componentDidMount() {
@@ -235,23 +257,50 @@ class EditorComponent extends React.Component {
 		return (
 			<div className="editor-container">
 				<div className="doc-details">
-					<p>
+					<p
+						onClick={() => {
+							$('#new-name-input').show();
+						}}
+					>
 						Name: <strong>{this.state.document.name}</strong>
+						<input
+							id="new-name-input"
+							style={{ display: 'none' }}
+							onChange={e => {
+								this.setState({ name: e.target.value });
+							}}
+							type="text"
+							placeholder="New Name"
+						/>
 					</p>
 					<p>
-						Created: <strong>{new Date(this.state.document.createdOn).toDateString()}</strong>
+						Created:{' '}
+						<strong>
+							{new Date(this.state.document.createdOn).toDateString()}
+						</strong>
 					</p>
 					<p>
 						Author: <strong>{this.state.document.email}</strong>
 					</p>
 					<p>
-						Last Edit:<strong>{this.state.document.lastEdit? new Date(this.state.document.lastEdit).toDateString(): 'N/A'}</strong><br/>
+						Last Edit:<strong>
+							{this.state.document.lastEdit
+								? new Date(this.state.document.lastEdit).toDateString()
+								: 'N/A'}
+						</strong>
+						<br />
 						Editor:<strong>{this.state.document.editor}</strong>
 					</p>
 				</div>
 				<div className="buttons-container">
 					<button className="btn btn-warning" onClick={this.toggleShareInput}>
 						Share
+					</button>
+					<button
+						onClick={this.deleteItem}
+						className="delete-button btn btn-danger"
+					>
+						Delete
 					</button>
 				</div>
 				<div id="share-input">
@@ -277,7 +326,7 @@ class EditorComponent extends React.Component {
 	}
 }
 
-class EmptyEditorComponent extends React.Component {
+class EmptyEditorComponent extends Component {
 	constructor(props) {
 		super(props);
 		this.state = {
@@ -336,6 +385,7 @@ class EmptyEditorComponent extends React.Component {
 			}
 		})();
 	};
+
 	saveDocument = () => {
 		let obj = {
 			ownerId: this.state.user.uid,
@@ -393,4 +443,47 @@ class EmptyEditorComponent extends React.Component {
 		);
 	}
 }
-//todo fix save edited doc on shared docs
+
+class AdminPanel extends Component {
+	constructor(props) {
+		super(props);
+		this.state = {
+			collection: {}
+		};
+	}
+
+	getEveryDocumentInDatabase = () => {
+		firebase
+			.database()
+			.ref('documents')
+			.on('value', data => {
+				let out = [];
+				let USERS = data.val();
+				for (let userKey in USERS) {
+					for (let userDoc in USERS[userKey]) {
+						out[userDoc] = USERS[userKey][userDoc];
+					}
+				}
+				this.setState({ collection: out });
+			});
+	};
+	
+	getEveryUser = ()=>{
+		firebase.database().ref()
+	}
+
+	componentDidMount() {
+		this.getEveryDocumentInDatabase();
+	}
+
+	render() {
+		return (
+			<div className="admin-panel">
+				<div className="documents-container">
+					<h3>Documents in DB</h3>
+					<UserCollection userCollection={this.state.collection} />
+				</div>
+			</div>
+		);
+	}
+}

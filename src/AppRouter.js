@@ -198,7 +198,8 @@ class EditorComponent extends Component {
 				obj.createdOn = this.state.document.createdOn;
 				obj.lastEdit = Date.now();
 				obj.editor = this.state.user.email;
-
+        obj.ownerId = this.state.document.ownerId;
+        
 				firebase
 					.database()
 					.ref(`documents/${this.state.document.ownerId}/${this.state.docId}`)

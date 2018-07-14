@@ -291,7 +291,7 @@ class EditorComponent extends Component {
 								: 'N/A'}
 						</strong>
 						<br />
-						Editor:<strong>{this.state.document.editor}</strong>
+						Editor:<strong>{this.state.document.editor?this.state.document.editor:'N/A'}</strong>
 					</p>
           <div className="buttons-container">
             <button className="btn btn-warning button share-button" onClick={this.toggleShareInput}>
@@ -429,8 +429,7 @@ class EmptyEditorComponent extends Component {
 	render() {
 		return (
 			<div className="editor-container">
-        <button onClick={()=>this.createNotification('success','success')}>Test BTN</button>
-        
+				
 				<input
           className='document-name-input'
 					id="document-name"

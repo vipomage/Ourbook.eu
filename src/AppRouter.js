@@ -469,11 +469,15 @@ class AdminPanel extends Component {
 	};
 	
 	getEveryUser = ()=>{
-		firebase.database().ref()
-	}
+		firebase.database().ref('users').on('value',data=>{
+		  let users = data.val();
+      this.setState({users})
+    })
+	};
 
 	componentDidMount() {
 		this.getEveryDocumentInDatabase();
+		this.getEveryUser()
 	}
 
 	render() {
@@ -483,7 +487,28 @@ class AdminPanel extends Component {
 					<h3>Documents in DB</h3>
 					<UserCollection userCollection={this.state.collection} />
 				</div>
+        <div className="user-container">
+          <h3>Registered Users</h3>
+          <User users={this.state.users}/>
+        </div>
 			</div>
 		);
+	}
+}
+
+class User extends Component {
+	render() {
+		let result = [];
+		let userList = this.props.users;
+		for (let user in userList) {
+			result.push(
+				<div className="user">
+					Name:<h3>{userList[user].displayName}</h3>
+					Email:<p>{userList[user].email}</p>
+					UID:<p>{userList[user].uid}</p>
+				</div>
+			);
+		}
+		return <div className="user-list">{result}</div>;
 	}
 }

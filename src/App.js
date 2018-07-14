@@ -165,7 +165,6 @@ class App extends Component {
 				this.getUserDocs();
 				this.getSharedDocs();
         this.isAdmin(user.uid).then(result=>{
-          console.log(result);
           this.setState({isAdmin:result})
         })
 			}

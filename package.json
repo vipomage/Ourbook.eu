@@ -1,8 +1,11 @@
 {
-  "homepage": "https://vipomage.github.io/pageTest",
   "name": "react-project",
   "version": "0.1.0",
   "private": true,
+  "license": "MIT",
+  "repository": "https://github.com/vipomage/____" ,
+  "author": "vipomage",
+  "bugs": "https://github.com/vipomage/____/issues",
   "dependencies": {
     "@types/firebase": "^3.2.1",
     "firebase": "^5.2.0",

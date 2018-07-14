@@ -182,6 +182,7 @@ class App extends Component {
 		} else {
 			return (
 				<div className="container">
+          <NotificationContainer />
 					<Sidebar
 						displayName={this.state.user.displayName}
 						img={this.state.user.photoURL}
@@ -191,8 +192,7 @@ class App extends Component {
 						uid={this.state.uid}
 						isAdmin={this.state.isAdmin}
 					/>
-					<main>
-						<NotificationContainer />
+					<div>
 						<AppRouter
 							createNotification={this.createNotification}
 							textContainer={this.state.text}
@@ -201,7 +201,7 @@ class App extends Component {
 							user={this.state.user}
 							userCollection={this.state.userCollection}
 						/>
-					</main>
+					</div>
 				</div>
 			);
 		}

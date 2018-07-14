@@ -13,7 +13,7 @@ export default class UserCollection extends Component {
 				);
 		}
 		if (list.length !== 0) {
-			return <ol className="user-collection-list ADD_CSS">{list}</ol>;
+			return <ol className="user-collection-list">{list}</ol>;
 		} else {
 			return <p>Empty</p>;
 		}
@@ -34,7 +34,7 @@ export class SharedCollection extends Component {
 				);
 		}
 		if (list.length !== 0) {
-			return <ol className="shared-collection-list ADD_CSS">{list}</ol>;
+			return <ol className="shared-collection-list">{list}</ol>;
 		} else {
 			return <p>Empty</p>;
 		}

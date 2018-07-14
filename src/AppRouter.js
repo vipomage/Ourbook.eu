@@ -27,7 +27,7 @@ export default class AppRouter extends Component {
 
 	render() {
 		return (
-			<Switch>
+			<Switch className='switch'>
 				<Route
 					path="/documents/:id"
 					props={{ ...this }}
@@ -257,13 +257,14 @@ class EditorComponent extends Component {
 		return (
 			<div className="editor-container">
 				<div className="doc-details">
-					<p
+					<p className='document-name'
 						onClick={() => {
 							$('#new-name-input').show();
 						}}
 					>
 						Name: <strong>{this.state.document.name}</strong>
 						<input
+              className='new-name-input-field'
 							id="new-name-input"
 							style={{ display: 'none' }}
 							onChange={e => {
@@ -273,16 +274,16 @@ class EditorComponent extends Component {
 							placeholder="New Name"
 						/>
 					</p>
-					<p>
+					<p className='created-on-date'>
 						Created:{' '}
 						<strong>
 							{new Date(this.state.document.createdOn).toDateString()}
 						</strong>
 					</p>
-					<p>
+					<p className='author-email'>
 						Author: <strong>{this.state.document.email}</strong>
 					</p>
-					<p>
+					<p className='last-edit editor-email'>
 						Last Edit:<strong>
 							{this.state.document.lastEdit
 								? new Date(this.state.document.lastEdit).toDateString()
@@ -291,17 +292,17 @@ class EditorComponent extends Component {
 						<br />
 						Editor:<strong>{this.state.document.editor}</strong>
 					</p>
-				</div>
-				<div className="buttons-container">
-					<button className="btn btn-warning" onClick={this.toggleShareInput}>
-						Share
-					</button>
-					<button
-						onClick={this.deleteItem}
-						className="delete-button btn btn-danger"
-					>
-						Delete
-					</button>
+          <div className="buttons-container">
+            <button className="btn btn-warning button share-button" onClick={this.toggleShareInput}>
+              Share
+            </button>
+            <button
+              onClick={this.deleteItem}
+              className="btn btn-danger button delete-button"
+            >
+              Delete
+            </button>
+          </div>
 				</div>
 				<div id="share-input">
 					<input
@@ -311,16 +312,17 @@ class EditorComponent extends Component {
 						type="email"
 						placeholder="user email"
 					/>
-					<button className="btn btn-primary" onClick={this.createShare}>
+					<button className="btn btn-primary button create-share-button" onClick={this.createShare}>
 						Create Share
 					</button>
 				</div>
 				<ReactQuill
+          className='react-quill-editor'
 					modules={{ toolbar: this.toolbarOptions }}
 					value={this.state.text}
 					onChange={this.handleChange}
 				/>
-				<button onClick={this.saveDocument}>Save Doc</button>
+				<button className='btn btn-primary button save-button' onClick={this.saveDocument}>Save Doc</button>
 			</div>
 		);
 	}
@@ -426,7 +428,10 @@ class EmptyEditorComponent extends Component {
 	render() {
 		return (
 			<div className="editor-container">
+        <button onClick={()=>this.createNotification('success','success')}>Test BTN</button>
+        
 				<input
+          className='document-name-input'
 					id="document-name"
 					onChange={e => this.setState({ document: { name: e.target.value } })}
 					placeholder="Document Name"
@@ -434,11 +439,12 @@ class EmptyEditorComponent extends Component {
 				/>
 
 				<ReactQuill
+          className='react-quill-editor'
 					modules={{ toolbar: this.toolbarOptions }}
 					value={this.state.text}
 					onChange={this.handleChange}
 				/>
-				<button onClick={this.saveDocument}>Save Doc</button>
+				<button className='btn btn-primary button save-document-button' onClick={this.saveDocument}>Save Doc</button>
 			</div>
 		);
 	}
@@ -482,7 +488,7 @@ class AdminPanel extends Component {
 
 	render() {
 		return (
-			<div className="admin-panel">
+			<div className="admin-panel-container">
 				<div className="documents-container">
 					<h3>Documents in DB</h3>
 					<UserCollection userCollection={this.state.collection} />
@@ -502,10 +508,10 @@ class User extends Component {
 		let userList = this.props.users;
 		for (let user in userList) {
 			result.push(
-				<div className="user">
-					Name:<h3>{userList[user].displayName}</h3>
-					Email:<p>{userList[user].email}</p>
-					UID:<p>{userList[user].uid}</p>
+				<div key={user} className="user">
+					<div className='user-name-container'>Name:<h3>{userList[user].displayName}</h3></div>
+					<div className='user-email-container'>Email:<p>{userList[user].email}</p></div>
+					<div className='user-uid-container'>UID:<p>{userList[user].uid}</p></div>
 				</div>
 			);
 		}

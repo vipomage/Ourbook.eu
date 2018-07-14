@@ -20,11 +20,11 @@ export default class Sidebar extends Component {
 	}
 	render() {
 		return (
-			<aside>
-				<h1 className="mainHeading">Ourbook</h1>
+			<aside className='aside-container'>
+				<h1 className="mainHeading">Ourbook.eu</h1>
 				<img className="profilePicture" src={this.props.img} alt="" />
 				<p className="name">{this.props.displayName}</p>
-				<button className="btn btn-warning" onClick={this.props.logout}>
+				<button className="btn btn-warning button button-logout" onClick={this.props.logout}>
 					Log out
 				</button>
 				<SidebarNavigation isAdmin={this.props.isAdmin} />

@@ -1,5 +1,60 @@
 .ADD_CSS {
-  outline: red 2px solid;
+  outline: red 2px dotted;
+}
+
+#root > div > aside > h1 {
+  text-transform: capitalize;
+  padding: 10px 0 0 0;
+}
+
+.notification-info {
+  background-color: #4485f2;
+}
+
+.btn-primary {
+  background-color: #4485f2;
+}
+
+.btn-danger {
+  background-color: #c24942;
+}
+
+div.wrapper.sign-in {
+  width: 63%;
+  margin: 10% auto;
+}
+div.wrapper.sign-in h1 {
+  margin: 100px;
+  font-size: 5rem;
+}
+div.wrapper.sign-in button {
+  width: fit-content;
+  margin: 50px auto 0 auto;
+  background-color: #4485f2;
+  color: white;
+  padding: 26px;
+}
+
+.welcome-screen-container {
+  margin: 0px 5%;
+  padding: 10%;
+}
+.welcome-screen-container h1 {
+  line-height: 200px;
+}
+.welcome-screen-container .web-info {
+  padding: 15px;
+}
+
+#share-input {
+  margin: 5px;
+}
+#share-input input {
+  height: 30px;
+  margin: 3px;
+}
+#share-input button {
+  margin: 5px;
 }
 
 body {
@@ -12,27 +67,19 @@ body {
   font-size: 14px;
   background-color: #f3f5f7;
 }
-body aside {
-  height: 100%;
-  position: fixed;
-  left: 0;
-}
 body .sign-in {
   text-align: center;
   align-content: center;
-}
-body img {
-  background: white;
-  width: 100px;
-  padding: 15px 30px;
 }
 body .mainHeading {
   text-transform: lowercase;
   font-size: 30px;
 }
 body .name {
+  margin-top: 5px;
   color: darkgray;
   font-size: 1.2rem;
+  margin-bottom: 0;
 }
 body h1 {
   font-weight: 100;
@@ -49,19 +96,34 @@ body div.areaInfo {
 body div.areaInfo p.region {
   font-weight: bold;
 }
+body .container {
+  margin: 0 15%;
+}
 body aside {
+  height: 100%;
+  position: fixed;
+  left: 0;
   background-color: white;
   float: left;
   width: 200px;
-  height: 100%;
   text-align: center;
   text-transform: uppercase;
 }
-body aside .user-collection-container {
-  border: 1px solid green;
-  text-align: center;
+@media screen and (max-width: 770px) {
+  body aside {
+    display: none;
+  }
 }
-body aside .user-collection-container ol {
+body aside .user-collection-container, body aside .shared-collection-container {
+  border-bottom: 1px solid black;
+  text-align: center;
+  overflow: hidden;
+  text-transform: capitalize;
+}
+body aside .user-collection-container p, body aside .shared-collection-container p {
+  font-weight: bold;
+}
+body aside .user-collection-container ol, body aside .shared-collection-container ol {
   list-style: decimal-leading-zero;
   text-align: justify;
 }
@@ -78,8 +140,8 @@ body aside li:hover {
   cursor: pointer;
 }
 body img.profilePicture {
-  width: 150px;
-  border-radius: 50%;
+  width: 90%;
+  border-radius: 20%;
 }
 body ul {
   letter-spacing: 2px;
@@ -91,20 +153,52 @@ body h1 em {
   font-style: normal;
 }
 body .editor-container {
-  margin: 30px 30px 20px 250px;
-  border: 1px solid #ccc;
+  margin: 0 5% 0 10%;
   cursor: text;
   min-height: 80px;
-  padding: 10px;
+  padding: 15px;
 }
-body .quill {
-  min-height: 20px;
+body .editor-container #document-name {
   margin-top: 20px;
 }
-body #root > div > aside > nav {
-  margin: 10px 0;
+body .editor-container .ql-toolbar {
+  padding: 15px;
+  display: flow-root;
+}
+body .editor-container .ql-toolbar span button, body .editor-container .ql-toolbar span span {
+  font-size: 0.9rem;
+  padding: 0px;
+}
+body .editor-container .doc-details {
+  outline: 1px solid #ccc;
+  display: flex;
+  flex-direction: row;
+}
+body .editor-container .doc-details p {
   display: grid;
-  padding: 3px;
+  margin: 0 auto;
+}
+body .ql-container {
+  margin-bottom: 20px;
+}
+body .quill {
+  min-height: 300px;
+  margin-top: 20px;
+}
+body .quill .ql-editor {
+  min-height: 250px;
+  background: white;
+}
+body .button-logout {
+  margin: 10px 15px;
+}
+body #root > div > aside > nav {
+  margin: 10px 15px;
+  display: grid;
+  text-transform: initial;
+}
+body #root > div > aside > nav a {
+  margin: 5px 0;
 }
 body .doc-details {
   display: inline-flex;
@@ -123,9 +217,29 @@ body #share-input {
 body .buttons-container .btn {
   margin: 5px;
 }
-body .admin-panel {
-  width: 150px;
-  margin-left: 100px;
+
+#root > div > div:nth-child(3) {
+  margin: 0 auto;
+  display: inherit;
+}
+#root > div > div:nth-child(3) .admin-panel-container {
+  display: inline-flex;
+}
+#root > div > div:nth-child(3) .documents-container, #root > div > div:nth-child(3) .user-container {
+  padding: 30px;
+  margin: 10px 20px;
+  outline: 1px solid;
+}
+#root > div > div:nth-child(3) .documents-container > h3, #root > div > div:nth-child(3) .user-container > h3 {
+  font-size: 1.2rem;
+  padding: 15px;
+  border-bottom: 1px solid;
+}
+#root > div > div:nth-child(3) .documents-container div.user, #root > div > div:nth-child(3) .user-container div.user {
+  border-bottom: 1px solid;
+}
+#root > div > div:nth-child(3) .documents-container div.user-name-container h3, #root > div > div:nth-child(3) .documents-container div.user-name-container p, #root > div > div:nth-child(3) .documents-container .user-email-container h3, #root > div > div:nth-child(3) .documents-container .user-email-container p, #root > div > div:nth-child(3) .documents-container .user-uid-container h3, #root > div > div:nth-child(3) .documents-container .user-uid-container p, #root > div > div:nth-child(3) .user-container div.user-name-container h3, #root > div > div:nth-child(3) .user-container div.user-name-container p, #root > div > div:nth-child(3) .user-container .user-email-container h3, #root > div > div:nth-child(3) .user-container .user-email-container p, #root > div > div:nth-child(3) .user-container .user-uid-container h3, #root > div > div:nth-child(3) .user-container .user-uid-container p {
+  color: blue;
 }
 
 /*# sourceMappingURL=App.css.map */

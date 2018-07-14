@@ -4,7 +4,7 @@ import { Link } from 'react-router-dom';
 export default class SidebarNavigation extends Component {
 	render() {
 		return (
-			<nav className="side-nav ADD_CSS">
+			<nav className="side-nav">
 				<Link className="btn btn-primary" to="/">
 					Home
 				</Link>

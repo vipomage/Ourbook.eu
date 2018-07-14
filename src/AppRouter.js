@@ -1,11 +1,12 @@
 import React, { Component } from 'react';
 import { Route, Switch } from 'react-router-dom';
-import Welcome from './components/Welcome';
-import ReactQuill from 'react-quill';
 import firebase from './firebase';
 import $ from 'jquery';
 import { NotificationManager } from 'react-notifications';
-import UserCollection from './components/UserCollection';
+import Welcome from './components/Welcome';
+import ReactQuill from 'react-quill';
+import AdminPanel from './components/AdminPanel'
+
 
 export default class AppRouter extends Component {
 	constructor(props) {
@@ -447,74 +448,5 @@ class EmptyEditorComponent extends Component {
 				<button className='btn btn-primary button save-document-button' onClick={this.saveDocument}>Save Doc</button>
 			</div>
 		);
-	}
-}
-
-class AdminPanel extends Component {
-	constructor(props) {
-		super(props);
-		this.state = {
-			collection: {}
-		};
-	}
-
-	getEveryDocumentInDatabase = () => {
-		firebase
-			.database()
-			.ref('documents')
-			.on('value', data => {
-				let out = [];
-				let USERS = data.val();
-				for (let userKey in USERS) {
-					for (let userDoc in USERS[userKey]) {
-						out[userDoc] = USERS[userKey][userDoc];
-					}
-				}
-				this.setState({ collection: out });
-			});
-	};
-	
-	getEveryUser = ()=>{
-		firebase.database().ref('users').on('value',data=>{
-		  let users = data.val();
-      this.setState({users})
-    })
-	};
-
-	componentDidMount() {
-		this.getEveryDocumentInDatabase();
-		this.getEveryUser()
-	}
-
-	render() {
-		return (
-			<div className="admin-panel-container">
-				<div className="documents-container">
-					<h3>Documents in DB</h3>
-					<UserCollection userCollection={this.state.collection} />
-				</div>
-        <div className="user-container">
-          <h3>Registered Users</h3>
-          <User users={this.state.users}/>
-        </div>
-			</div>
-		);
-	}
-}
-
-class User extends Component {
-	render() {
-		let result = [];
-		let userList = this.props.users;
-		for (let user in userList) {
-			result.push(
-				<div key={user} className="user">
-					<div className='user-name-container'>Name:<h3>{userList[user].displayName}</h3></div>
-					<div className='user-email-container'>Email:<p>{userList[user].email}</p></div>
-					<div className='user-uid-container'>UID:<p>{userList[user].uid}</p></div>
-				</div>
-			);
-		}
-		return <div className="user-list">{result}</div>;
 	}
 }

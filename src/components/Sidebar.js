@@ -1,5 +1,6 @@
 import React, { Component } from 'react';
-import UserCollection, { SharedCollection } from './UserCollection';
+import UserCollection from './UserCollection';
+import SharedCollection from './SharedCollection'
 import SidebarNavigation from './SidebarNavigation';
 
 export default class Sidebar extends Component {
